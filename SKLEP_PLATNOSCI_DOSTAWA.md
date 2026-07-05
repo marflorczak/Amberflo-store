@@ -42,6 +42,7 @@ Zaznacz zdarzenia:
 ```text
 checkout.session.completed
 checkout.session.async_payment_succeeded
+checkout.session.async_payment_failed
 ```
 
 Skopiuj sekret webhooka `whsec_...` i dodaj w Supabase:
@@ -86,4 +87,3 @@ Wtedy potwierdzenie wysyłki będzie wysyłane automatycznie.
 ## Koszty Stripe
 
 Stripe nie pobiera opłaty za założenie konta ani miesięcznego abonamentu w standardowym planie. Pobiera prowizję od udanych transakcji. Aktualny cennik dla Polski: https://stripe.com/en-pl/pricing
-

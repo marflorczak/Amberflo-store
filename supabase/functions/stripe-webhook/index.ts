@@ -12,11 +12,14 @@ serve(async req => {
     if (!signature) throw new Error("Brak podpisu Stripe");
     const body = await req.text();
     const event = await stripe.webhooks.constructEventAsync(body, signature, Deno.env.get("STRIPE_WEBHOOK_SECRET")!, undefined, cryptoProvider);
-    if (!["checkout.session.completed", "checkout.session.async_payment_succeeded"].includes(event.type)) return new Response("ok");
+    if (!["checkout.session.completed", "checkout.session.async_payment_succeeded", "checkout.session.async_payment_failed"].includes(event.type)) return new Response("ok");
     const session = event.data.object as Stripe.Checkout.Session;
-    if (session.payment_status !== "paid") return new Response("ok");
-
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    if (event.type === "checkout.session.async_payment_failed") {
+      await supabase.from("orders").update({ status: "payment_failed", updated_at: new Date().toISOString() }).eq("stripe_session_id", session.id);
+      return new Response("ok");
+    }
+    if (session.payment_status !== "paid") return new Response("ok");
     const { data: currentOrder, error: findError } = await supabase.from("orders").select("*").eq("stripe_session_id", session.id).single();
     if (findError || !currentOrder) throw findError || new Error("Nie znaleziono zamówienia");
     const { data: order, error: updateError } = await supabase.from("orders").update({ status: "paid", updated_at: new Date().toISOString() }).eq("id", currentOrder.id).select().single();
@@ -44,4 +47,3 @@ serve(async req => {
     return new Response(error.message, { status: 400 });
   }
 });
-

@@ -1,4 +1,4 @@
-const orderStatusLabels={awaiting_payment:'Oczekuje na płatność',awaiting_transfer:'Oczekuje na przelew',paid:'Opłacone',processing:'W realizacji',shipped:'Wysłane',cancelled:'Anulowane'};
+const orderStatusLabels={awaiting_payment:'Oczekuje na płatność',payment_failed:'Płatność nieudana',awaiting_transfer:'Oczekuje na przelew',paid:'Opłacone',processing:'W realizacji',shipped:'Wysłane',cancelled:'Anulowane'};
 const adminMoney=cents=>(Number(cents||0)/100).toLocaleString('pl-PL',{style:'currency',currency:'PLN'});
 
 function installStoreManagement(){

@@ -4,7 +4,7 @@ const money = value => new Intl.NumberFormat(currentLang === 'pl' ? 'pl-PL' : 'e
 let products = window.AMBERFLO_PRODUCTS || [];
 
 const colors = [
-  ['#f6bd18','Żółty','Yellow'],['#f4d968','Cytrynowy','Lemon'],['#984713','Koniakowy','Cognac'],['#81241e','Wiśniowy','Cherry']
+  ['#eab02b','Żółty','Yellow'],['#f5d95f','Cytrynowy','Lemon'],['#984713','Koniakowy','Cognac'],['#81241e','Wiśniowy','Cherry']
 ];
 const seedReviews = [
   {name:'Allegro · 216 kamieni',rating:5,content:{pl:'Średnia 5,00/5 na podstawie 18 ocen i 6 recenzji produktu.',en:'Average 5.00/5 based on 18 ratings and 6 product reviews.'},date:'dane Allegro'},

@@ -5,7 +5,13 @@ const escapeHtml=(value='')=>String(value).replace(/[&<>"']/g,char=>({'&':'&amp;
 const slug=value=>String(value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80);
 
 function authHeaders(json=true){const headers={apikey:config.supabaseAnonKey,Authorization:`Bearer ${state.session?.access_token||config.supabaseAnonKey}`};if(json)headers['Content-Type']='application/json';return headers;}
-async function api(path,options={}){const response=await fetch(`${config.supabaseUrl}${path}`,{...options,headers:{...authHeaders(options.json!==false),...(options.headers||{})}});if(!response.ok){let message=`Błąd ${response.status}`;try{const body=await response.json();message=body.message||body.error_description||body.error||message}catch{}throw new Error(message)}if(response.status===204||response.headers.get('content-length')==='0')return null;const text=await response.text();return text?JSON.parse(text):null;}
+async function fetchWithTimeout(url,options={},timeout=15000){
+  const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),timeout);
+  try{return await fetch(url,{...options,signal:controller.signal})}
+  catch(error){if(error.name==='AbortError')throw new Error('Serwer nie odpowiedział w ciągu 15 sekund. Odśwież stronę i spróbuj ponownie.');throw error}
+  finally{clearTimeout(timer)}
+}
+async function api(path,options={}){const response=await fetchWithTimeout(`${config.supabaseUrl}${path}`,{...options,headers:{...authHeaders(options.json!==false),...(options.headers||{})}});if(!response.ok){let message=`Błąd ${response.status}`;try{const body=await response.json();message=body.message||body.error_description||body.error||message}catch{}throw new Error(message)}if(response.status===204||response.headers.get('content-length')==='0')return null;const text=await response.text();return text?JSON.parse(text):null;}
 function toast(message){const el=$('#adminToast');el.textContent=message;el.classList.add('show');clearTimeout(window.adminToastTimer);window.adminToastTimer=setTimeout(()=>el.classList.remove('show'),2500)}
 function setLoginStatus(message){$('#loginStatus').textContent=message||''}
 
@@ -14,9 +20,10 @@ async function verifyAdmin(){
   if(!rows?.length)throw new Error('To konto nie ma uprawnień administratora.');
 }
 async function login(email,password){
-  const response=await fetch(`${config.supabaseUrl}/auth/v1/token?grant_type=password`,{method:'POST',headers:{apikey:config.supabaseAnonKey,'Content-Type':'application/json'},body:JSON.stringify({email,password})});
-  const body=await response.json();if(!response.ok)throw new Error(body.error_description||body.msg||'Nieprawidłowy e-mail lub hasło.');
-  state.session=body;await verifyAdmin();sessionStorage.setItem('amberflo-admin-session',JSON.stringify(body));showDashboard();
+  setLoginStatus('Sprawdzanie e-maila i hasła…');
+  const response=await fetchWithTimeout(`${config.supabaseUrl}/auth/v1/token?grant_type=password`,{method:'POST',headers:{apikey:config.supabaseAnonKey,'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+  const body=await response.json();if(!response.ok){const message=body.error_description||body.msg||'';if(/invalid login credentials/i.test(message))throw new Error('Nieprawidłowy e-mail lub hasło ustawione w Supabase.');if(/email not confirmed/i.test(message))throw new Error('Adres e-mail administratora nie został potwierdzony w Supabase.');throw new Error(message||'Nie udało się zalogować.');}
+  state.session=body;setLoginStatus('Sprawdzanie uprawnień administratora…');await verifyAdmin();sessionStorage.setItem('amberflo-admin-session',JSON.stringify(body));showDashboard();
 }
 function logout(){state.session=null;sessionStorage.removeItem('amberflo-admin-session');$('#adminView').hidden=true;$('#loginView').hidden=false;$('#loginForm').reset();setLoginStatus('')}
 async function showDashboard(){
@@ -78,7 +85,7 @@ document.addEventListener('click',async event=>{
   const deleteReview=event.target.closest('[data-delete-review]');if(deleteReview&&confirm('Usunąć opinię na stałe?')){await api(`/rest/v1/reviews?id=eq.${deleteReview.dataset.deleteReview}`,{method:'DELETE'});await loadReviews();toast('Opinia usunięta.')}
 });
 
-$('#loginForm').addEventListener('submit',async event=>{event.preventDefault();setLoginStatus('Logowanie…');const data=new FormData(event.target);try{await login(data.get('email'),data.get('password'))}catch(error){state.session=null;setLoginStatus(error.message)}});
+$('#loginForm').addEventListener('submit',async event=>{event.preventDefault();const button=event.target.querySelector('button[type="submit"]');button.disabled=true;const data=new FormData(event.target);try{await login(data.get('email'),data.get('password'))}catch(error){state.session=null;setLoginStatus(error.message)}finally{button.disabled=false}});
 $('#logoutButton').onclick=logout;$('#addProduct').onclick=()=>fillForm();document.querySelectorAll('.close-editor').forEach(button=>button.onclick=()=>$('#productEditor').close());$('#productForm').addEventListener('submit',event=>{event.preventDefault();saveProduct(event.target)});
 
 (async function init(){

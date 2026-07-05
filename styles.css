@@ -25,3 +25,8 @@ footer>div img{width:130px;height:82px;object-fit:cover;object-position:center;f
   .lang-btn{width:25px;height:25px;padding:0}
   .cart-button{padding:8px}
 }
+
+/* Pełny pionowy kadr zdjęcia oraz wyśrodkowane podpisy palety. */
+.about-photo img{aspect-ratio:2/3;object-fit:cover;object-position:center}
+.swatch{text-align:center}
+.swatch b{display:block;text-align:center}

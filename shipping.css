@@ -1,0 +1,7 @@
+.shipping-summary{margin:14px 0 20px;padding:16px;background:#fffaf3;border:1px solid var(--line)}
+.shipping-summary div{display:flex;justify-content:space-between;gap:20px;padding:4px 0;font-size:13px}
+.shipping-summary .shipping-grand-total{margin-top:8px;padding-top:10px;border-top:1px solid var(--line);font-size:17px;font-weight:700}
+.shipping-help{display:block;margin-top:-8px;margin-bottom:14px;color:var(--muted);font-size:10px}
+#shippingMethod{border:1px solid var(--line);background:#fffaf3;padding:12px;outline:none}
+#shippingMethod:focus{border-color:var(--amber)}
+

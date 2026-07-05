@@ -4,7 +4,7 @@ const money = value => new Intl.NumberFormat(currentLang === 'pl' ? 'pl-PL' : 'e
 let products = window.AMBERFLO_PRODUCTS || [];
 
 const colors = [
-  ['rgba(250,176,7,.64)','Cytrynowy','Lemon'],['#f5d95f','Żółty','Yellow'],['#984713','Koniakowy','Cognac'],['#81241e','Wiśniowy','Cherry']
+  ['rgba(236,201,53,.72)','Cytrynowy','Lemon'],['#f5d95f','Żółty','Yellow'],['#984713','Koniakowy','Cognac'],['linear-gradient(145deg,#520611 0%,#340006 48%,#140002 100%)','Wiśniowy','Cherry']
 ];
 const seedReviews = [
   {name:'Allegro · 216 kamieni',rating:5,content:{pl:'Średnia 5,00/5 na podstawie 18 ocen i 6 recenzji produktu.',en:'Average 5.00/5 based on 18 ratings and 6 product reviews.'},date:'dane Allegro'},
@@ -18,6 +18,8 @@ const i18n = {
 };
 i18n.pl.workshop = 'Pracownia Amberflo';
 i18n.pl.announcement = 'Darmowa dostawa od 300 zł · Rękodzieło z Polski · Zamówienia hurtowe';
+i18n.pl.notesPlaceholder = 'np. Mix / Cytryna';
+i18n.pl.colorOrderInfo = '<p>Kolory są poglądowe. Odcień bursztynu może delikatnie różnić się od rzeczywistego koloru bursztynu na drzewku.</p><p>W polu „Uwagi / wybrany kolor bursztynu” proszę podać wybrany kolor:</p><ul><li>Mix kolor</li><li>Cytryna</li><li>Żółty</li><li>Koniak jasny/ciemny</li><li>Wiśnia</li></ul>';
 i18n.pl.documentLabel = 'Dokument sprzedaży';
 i18n.pl.receiptOption = 'Paragon';
 i18n.pl.receiptHint = 'Dla osoby prywatnej';
@@ -35,6 +37,8 @@ i18n.pl.openingHoursValue = 'Poniedziałek–sobota: 8:00–16:00';
 i18n.pl.closedSunday = 'Niedziela: nieczynne';
 i18n.en.workshop = 'Amberflo workshop';
 i18n.en.announcement = 'Free delivery from PLN 300 · Handmade in Poland · Wholesale orders';
+i18n.en.notesPlaceholder = 'e.g. Colour mix / Lemon';
+i18n.en.colorOrderInfo = '<p>The colours shown are for reference. The shade of amber on the tree may differ slightly from the colour presented.</p><p>Enter your selected colour in the “Notes / preferred amber colour” field:</p><ul><li>Colour mix</li><li>Lemon</li><li>Yellow</li><li>Light/dark cognac</li><li>Cherry</li></ul>';
 i18n.en.documentLabel = 'Sales document';
 i18n.en.receiptOption = 'Receipt';
 i18n.en.receiptHint = 'For individual customers';
@@ -75,7 +79,7 @@ async function loadCatalog(){
 
 function renderSwatches(){ $('#swatches').innerHTML=colors.map(c=>`<div class="swatch"><div class="swatch-color" style="background:${c[0]}"></div><b>${currentLang==='pl'?c[1]:c[2]}</b></div>`).join(''); }
 function renderProducts(){ const visible=products.filter(p=>activeFilter==='all'||p.category===activeFilter); $('#productGrid').innerHTML=visible.map(p=>`<article class="product-card"><div class="product-image" data-detail="${p.id}" role="button" tabindex="0"><span class="product-badge">${p.badge[currentLang]}</span><img src="${p.image}" alt="${p.name[currentLang]}" loading="lazy"></div><div class="product-info"><div class="product-meta"><span>${p.height}</span><span>${p.pieces} ${currentLang==='pl'?'bryłek':'stones'}</span></div><h3>${p.name[currentLang]}</h3><p class="product-description">${p.desc[currentLang]}</p><div class="product-bottom"><strong class="price">${money(p.price)}</strong><button class="add-cart" data-add="${p.id}" aria-label="${t('addToCart')}">+</button></div></div></article>`).join(''); }
-function updateI18n(){ document.documentElement.lang=currentLang; document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.dataset.i18n;if(i18n[currentLang][key])el.innerHTML=i18n[currentLang][key]}); document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLang)); renderSwatches();renderProducts();renderReviews();renderCart(); }
+function updateI18n(){ document.documentElement.lang=currentLang; document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.dataset.i18n;if(i18n[currentLang][key])el.innerHTML=i18n[currentLang][key]}); document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const key=el.dataset.i18nPlaceholder;if(i18n[currentLang][key])el.placeholder=i18n[currentLang][key]}); document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLang)); renderSwatches();renderProducts();renderReviews();renderCart(); }
 function renderReviews(){ let local=JSON.parse(localStorage.getItem('amberflo-reviews')||'[]').filter(r=>r.status==='approved'); let reviews=[...seedReviews,...local]; $('#reviewsGrid').innerHTML=reviews.slice(0,6).map(r=>`<article class="review-card"><div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div><blockquote>${typeof r.content==='object'?r.content[currentLang]:`“${escapeHtml(r.content)}”`}</blockquote><footer><b>${escapeHtml(r.name)}</b><small>${r.date||''}</small></footer></article>`).join(''); }
 function escapeHtml(s=''){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
 function addToCart(id){ const found=cart.find(x=>x.id===id);found?found.qty++:cart.push({id,qty:1});saveCart();toast(t('added')); }

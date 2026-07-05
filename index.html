@@ -9,13 +9,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=7">
+  <link rel="stylesheet" href="styles.css?v=8">
   <link rel="stylesheet" href="map.css">
   <link rel="stylesheet" href="gallery.css">
   <link rel="stylesheet" href="shipping.css?v=4">
   <script src="config.js?v=5" defer></script>
   <script src="products.js" defer></script>
-  <script src="app.js?v=7" defer></script>
+  <script src="app.js?v=13" defer></script>
   <script src="shipping.js?v=4" defer></script>
 </head>
 <body>
@@ -78,7 +78,14 @@
         <h2 data-i18n="chooseColor">Wybierz swoje światło</h2>
         <p data-i18n="colorText">Od krystalicznej cytryny po głęboki wiśniowy — natura maluje każdą bryłkę inaczej.</p>
       </div>
-      <div class="swatches" id="swatches"></div>
+      <div class="color-options">
+        <div class="color-guidance" data-i18n="colorOrderInfo">
+          <p>Kolory są poglądowe. Odcień bursztynu może delikatnie różnić się od rzeczywistego koloru bursztynu na drzewku.</p>
+          <p>W polu „Uwagi / wybrany kolor bursztynu” proszę podać wybrany kolor:</p>
+          <ul><li>Mix kolor</li><li>Cytryna</li><li>Żółty</li><li>Koniak jasny/ciemny</li><li>Wiśnia</li></ul>
+        </div>
+        <div class="swatches" id="swatches"></div>
+      </div>
     </section>
 
     <section class="shop-section" id="sklep">
@@ -205,7 +212,7 @@
         <button class="button inpost-map-button" id="openInpostMap" type="button">Wybierz Paczkomat na mapie</button>
         <p class="selected-inpost-point" id="selectedInpostPoint" aria-live="polite"></p>
       </section>
-      <label><span data-i18n="notesLabel">Uwagi / wybrany kolor bursztynu</span><textarea name="notes" rows="2"></textarea></label>
+      <label><span data-i18n="notesLabel">Uwagi / wybrany kolor bursztynu</span><textarea name="notes" rows="2" placeholder="np. Mix / Cytryna" data-i18n-placeholder="notesPlaceholder"></textarea></label>
       <div class="shipping-summary"><div><span>Produkty</span><b id="checkoutProductsTotal">0 zł</b></div><div><span>Dostawa</span><b id="checkoutShippingTotal">0 zł</b></div><div class="shipping-grand-total"><span>Razem</span><b id="checkoutGrandTotal">0 zł</b></div></div>
       <fieldset><legend data-i18n="paymentLabel">Metoda płatności</legend><label class="payment-option"><input type="radio" name="payment" value="online" checked><span><b data-i18n="onlinePayment">Karta / BLIK / Przelewy24</b><small>Stripe Checkout</small></span></label><label class="payment-option"><input type="radio" name="payment" value="transfer"><span><b data-i18n="traditionalTransfer">Przelew tradycyjny</b><small>mBank · 92 1140 2004 0000 3102 7968 1765</small></span></label></fieldset>
       <label class="legal-consent"><input type="checkbox" name="legal" required><span data-i18n="consentText">Akceptuję <a href="regulamin.html" target="_blank">regulamin</a> oraz zapoznałem/am się z <a href="polityka-prywatnosci.html" target="_blank">polityką prywatności</a> i zasadami <a href="dostawa-i-zwroty.html" target="_blank">dostaw i zwrotów</a>.</span></label>

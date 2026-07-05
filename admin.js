@@ -15,9 +15,10 @@ async function api(path,options={}){const response=await fetchWithTimeout(`${con
 function toast(message){const el=$('#adminToast');el.textContent=message;el.classList.add('show');clearTimeout(window.adminToastTimer);window.adminToastTimer=setTimeout(()=>el.classList.remove('show'),2500)}
 function setLoginStatus(message){$('#loginStatus').textContent=message||''}
 
-async function verifyAdmin(){
-  const allowed=await api('/rest/v1/rpc/is_admin',{method:'POST',body:'{}'});
-  if(allowed!==true)throw new Error('To konto nie ma uprawnień administratora.');
+function verifyAdmin(){
+  const expected=String(config.adminEmail||'biuroamberflo@gmail.com').trim().toLowerCase();
+  const actual=String(state.session?.user?.email||'').trim().toLowerCase();
+  if(!actual||actual!==expected)throw new Error('To konto nie ma uprawnień administratora.');
 }
 async function login(email,password){
   setLoginStatus('Sprawdzanie e-maila i hasła…');

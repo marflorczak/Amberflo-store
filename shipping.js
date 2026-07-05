@@ -35,7 +35,7 @@ function renderShippingMethods(){
 }
 
 function updateShippingSummary(){
-  const method=selectedShipping();const subtotal=productSubtotalCents();const shipping=subtotal>=50000?0:Number(method?.price_cents||0);
+  const method=selectedShipping();const subtotal=productSubtotalCents();const shipping=subtotal>=30000?0:Number(method?.price_cents||0);
   const subtotalEl=document.querySelector('#checkoutProductsTotal');const shippingEl=document.querySelector('#checkoutShippingTotal');const totalEl=document.querySelector('#checkoutGrandTotal');
   if(subtotalEl)subtotalEl.textContent=shippingMoney(subtotal);if(shippingEl)shippingEl.textContent=shippingMoney(shipping);if(totalEl)totalEl.textContent=shippingMoney(subtotal+shipping);
   updateShippingPointUi();
@@ -88,9 +88,22 @@ document.addEventListener('amberfloInpostPointSelected',event=>selectInpostPoint
 document.querySelector('#openInpostMap')?.addEventListener('click',openInpostMap);
 document.querySelector('#inpostPointName')?.addEventListener('input',event=>{const address=document.querySelector('#inpostPointAddress');const summary=document.querySelector('#selectedInpostPoint');if(address)address.value='';if(summary)summary.textContent=event.target.value?`Wybrany kod: ${event.target.value}`:''});
 
+function updateInvoiceFields(){
+  const form=document.querySelector('#checkoutForm');const section=document.querySelector('#invoiceFields');if(!form||!section)return;
+  const wantsInvoice=form.elements.document_type?.value==='invoice';section.hidden=!wantsInvoice;
+  ['invoice_name','tax_id','invoice_address'].forEach(name=>{const input=form.elements[name];if(input)input.required=wantsInvoice});
+}
+
+function validPolishNip(value){
+  const nip=String(value||'').replace(/\D/g,'');if(nip.length!==10)return false;
+  const weights=[6,5,7,2,3,4,5,6,7];const checksum=weights.reduce((sum,weight,index)=>sum+weight*Number(nip[index]),0)%11;
+  return checksum<10&&checksum===Number(nip[9]);
+}
+
 async function submitOrderWithShipping(form){
   const data=Object.fromEntries(new FormData(form));const items=cart.map(item=>({id:item.id,qty:item.qty}));const status=document.querySelector('#checkoutStatus');const button=form.querySelector('button[type="submit"]');
   if(!items.length){status.textContent=currentLang==='pl'?'Koszyk jest pusty.':'Your cart is empty.';return}
+  if(data.document_type==='invoice'&&!validPolishNip(data.tax_id)){status.textContent=currentLang==='pl'?'Sprawdź NIP — powinien zawierać 10 cyfr i mieć prawidłową sumę kontrolną.':'Check the Polish tax ID (NIP).';form.elements.tax_id?.focus();return}
   if(data.shipping_method==='inpost-paczkomat'&&!String(data.inpost_point_name||'').trim()){status.textContent=currentLang==='pl'?'Wybierz Paczkomat na mapie albo wpisz jego kod.':'Choose a parcel locker on the map or enter its code.';document.querySelector('#inpostPointName')?.focus();return}
   button.disabled=true;status.textContent=currentLang==='pl'?'Przygotowujemy zamówienie…':'Preparing your order…';
   const endpoint=data.payment==='online'?'create-checkout':'create-order';
@@ -99,14 +112,16 @@ async function submitOrderWithShipping(form){
     const result=await response.json();if(!response.ok)throw new Error(result.error||'Nie udało się utworzyć zamówienia.');
     if(data.payment==='online'){if(!result.url)throw new Error('Brak adresu płatności Stripe.');window.location.href=result.url;return}
     status.textContent=currentLang==='pl'?`Zamówienie ${result.orderId.slice(0,8).toUpperCase()} zostało przyjęte. Dane do przelewu znajdują się w sekcji Kontakt.`:`Order ${result.orderId.slice(0,8).toUpperCase()} has been received.`;
-    cart=[];saveCart();form.reset();const pointSummary=document.querySelector('#selectedInpostPoint');if(pointSummary)pointSummary.textContent='';renderShippingMethods();
+    cart=[];saveCart();form.reset();updateInvoiceFields();const pointSummary=document.querySelector('#selectedInpostPoint');if(pointSummary)pointSummary.textContent='';renderShippingMethods();
   }catch(error){status.textContent=error.message||'Nie udało się utworzyć zamówienia.'}
   finally{button.disabled=false}
 }
 
 const shippingSelect=document.querySelector('#shippingMethod');
 shippingSelect?.addEventListener('change',updateShippingSummary);
+document.querySelectorAll('[name="document_type"]').forEach(input=>input.addEventListener('change',updateInvoiceFields));
 document.querySelector('#checkoutButton')?.addEventListener('click',()=>setTimeout(updateShippingSummary,0));
 document.querySelector('#checkoutForm').onsubmit=event=>{event.preventDefault();submitOrderWithShipping(event.target)};
 document.addEventListener('click',event=>{if(event.target.closest('[data-lang]'))setTimeout(renderShippingMethods,0)});
 loadShippingMethods();
+updateInvoiceFields();

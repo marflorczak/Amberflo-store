@@ -12,15 +12,17 @@ serve(async req => {
     const { type, payload } = await req.json();
     if (!['review', 'order'].includes(type)) throw new Error('Invalid notification type');
     const resendKey = Deno.env.get("RESEND_API_KEY");
-    const ownerEmail = Deno.env.get("OWNER_EMAIL") || "biuroamberflo@gmail.com";
+    const ownerEmail = Deno.env.get("OWNER_EMAIL") || Deno.env.get("NOTIFICATION_EMAIL") || "biuroamberflo@gmail.com";
     const fromEmail = Deno.env.get("FROM_EMAIL") || "Amberflo <onboarding@resend.dev>";
+    const siteUrl = (Deno.env.get("SITE_URL") || "https://marflorczak.github.io/Amberflo-store").replace(/\/+$/, "");
+    const adminUrl = `${siteUrl}/admin.html`;
     if (!resendKey) throw new Error("Missing RESEND_API_KEY");
 
     const isOrder = type === 'order';
     const subject = isOrder ? `Nowe zamówienie Amberflo — ${esc(payload.name)}` : `Nowa opinia Amberflo — ${esc(payload.name)}`;
     const html = isOrder
       ? `<h1>Nowe zamówienie</h1><p><b>Klient:</b> ${esc(payload.name)}</p><p><b>Telefon:</b> ${esc(payload.phone)}</p><p><b>E-mail:</b> ${esc(payload.email)}</p><p><b>Adres:</b><br>${esc(payload.address).replace(/\n/g,'<br>')}</p><p><b>Uwagi:</b> ${esc(payload.notes)}</p><pre>${esc(payload.summary)}</pre><h2>Razem: ${esc(payload.total)}</h2>`
-      : `<h1>Nowa opinia do zatwierdzenia</h1><p><b>Autor:</b> ${esc(payload.name)}</p><p><b>Ocena:</b> ${esc(payload.rating)}/5</p><blockquote>${esc(payload.content)}</blockquote><p>Zaloguj się do Supabase i zmień status opinii na <b>approved</b>.</p>`;
+      : `<h1>Nowa opinia do zatwierdzenia</h1><p><b>Autor:</b> ${esc(payload.name)}</p><p><b>Ocena:</b> ${esc(payload.rating)}/5</p><blockquote>${esc(payload.content)}</blockquote><p><a href="${esc(adminUrl)}" style="display:inline-block;padding:12px 20px;background:#e88a0c;color:#fff;text-decoration:none">Otwórz panel opinii</a></p><p>W panelu Amberflo możesz zatwierdzić, odrzucić lub usunąć opinię.</p>`;
 
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",

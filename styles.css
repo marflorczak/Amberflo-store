@@ -5,3 +5,23 @@
 @media(max-width:560px){.hero{min-height:auto;padding:55px 20px 75px}.hero h1{font-size:47px}.hero-proof{gap:18px}.hero-proof strong{font-size:20px}.hero-proof span{font-size:8px}.hero-note{padding:10px 13px}.swatches{grid-template-columns:repeat(3,1fr)}.shop-section{padding-left:14px;padding-right:14px}.product-grid{grid-template-columns:1fr}.product-image{height:450px}.filter-row{overflow:auto}.craft-banner{margin:0;padding:50px 22px}.about-section{padding-left:25px;padding-right:25px}.photo-caption{left:-12px}.order-info{padding:28px 20px}.contact-section{padding-left:22px;padding-right:22px}.contact-copy h2{font-size:44px}footer nav{flex-wrap:wrap}.form-modal{padding:38px 22px}.form-grid{grid-template-columns:1fr}.cart-drawer{padding:25px}.product-modal-copy h2,.form-modal h2{font-size:34px}}
 .swatches{grid-template-columns:repeat(4,1fr);gap:12px}
 @media(max-width:560px){.swatches{grid-template-columns:repeat(2,1fr)}}
+
+/* Czytelne logo w stopce bez filtra rozjaśniającego. */
+footer>div img{width:130px;height:82px;object-fit:cover;object-position:center;filter:invert(1) hue-rotate(180deg);mix-blend-mode:screen;background:transparent;border-radius:0}
+
+/* Flagi językowe pozostają dostępne także w mobilnym nagłówku. */
+@media(max-width:820px){
+  .site-header{grid-template-columns:minmax(82px,1fr) auto auto;padding-left:12px;padding-right:12px;gap:8px}
+  .brand{width:100px}
+  .header-actions{gap:6px}
+  .language-switch{display:flex;padding:2px}
+  .lang-btn{width:27px;height:27px}
+  .cart-button{padding:9px 10px;gap:5px}
+}
+
+@media(max-width:360px){
+  .brand{width:82px}
+  .site-header{padding-left:8px;padding-right:8px;gap:5px}
+  .lang-btn{width:25px;height:25px;padding:0}
+  .cart-button{padding:8px}
+}

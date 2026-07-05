@@ -43,9 +43,9 @@ function updateShippingSummary(){
 
 let inpostAssetsPromise;
 function updateShippingPointUi(){
-  const method=selectedShipping();const isInpost=method?.id==='inpost-paczkomat';const isDpdPickup=method?.id==='dpd-pickup';
-  const picker=document.querySelector('#inpostPointPicker');const pointInput=document.querySelector('#inpostPointName');const help=document.querySelector('#shippingHelp');const mapButton=document.querySelector('#openInpostMap');
-  if(picker)picker.hidden=!isInpost;if(pointInput)pointInput.required=isInpost;if(help)help.hidden=!isDpdPickup;
+  const method=selectedShipping();const isInpost=method?.id==='inpost-paczkomat';
+  const picker=document.querySelector('#inpostPointPicker');const pointInput=document.querySelector('#inpostPointName');const mapButton=document.querySelector('#openInpostMap');
+  if(picker)picker.hidden=!isInpost;if(pointInput)pointInput.required=isInpost;
   if(mapButton)mapButton.textContent=currentLang==='pl'?'Wybierz Paczkomat na mapie':'Choose a parcel locker on the map';
 }
 

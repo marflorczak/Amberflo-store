@@ -3,14 +3,14 @@
 .invoice-fields{margin:0 0 14px;padding:16px;border:1px solid #e5c995;background:#fff8e9}
 .invoice-fields[hidden]{display:none}
 .invoice-fields-title{margin:0 0 12px;font-weight:700;color:#793900}
+.invoice-fields label,.inpost-point-picker label{display:flex;flex-direction:column;gap:6px;margin:0 0 14px}
+.invoice-fields input,.invoice-fields textarea,.inpost-point-picker input{display:block;width:100%;min-width:0}
 .shipping-summary div{display:flex;justify-content:space-between;gap:20px;padding:4px 0;font-size:13px}
 .shipping-summary .shipping-grand-total{margin-top:8px;padding-top:10px;border-top:1px solid var(--line);font-size:17px;font-weight:700}
-.shipping-help{display:block;margin-top:-8px;margin-bottom:14px;color:var(--muted);font-size:10px}
 #shippingMethod{border:1px solid var(--line);background:#fffaf3;padding:12px;outline:none}
 #shippingMethod:focus{border-color:var(--amber)}
 .inpost-point-picker{margin:0 0 14px;padding:14px;border:1px solid #e5c995;background:#fff8e9}
 .inpost-point-picker[hidden]{display:none}
-.inpost-point-picker label{margin:0 0 10px}
 .inpost-map-button{width:100%;padding:12px;border:1px solid #e88b00;background:#fff;color:#9a4b00;font-weight:700;cursor:pointer}
 .inpost-map-button:hover{background:#fff0cf}
 .selected-inpost-point{min-height:18px;margin:10px 0 0;color:var(--muted);font-size:12px}

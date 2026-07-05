@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Amberflo — ręcznie tworzone drzewka szczęścia z naturalnego bursztynu bałtyckiego.">
+  <meta name="theme-color" content="#1d1712">
+  <title>Amberflo — drzewka z bursztynu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="map.css">
+  <link rel="stylesheet" href="gallery.css">
+  <script src="config.js" defer></script>
+  <script src="products.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="announcement" data-i18n="announcement">Darmowa dostawa od 500 zł · Rękodzieło z Polski · Zamówienia hurtowe</div>
+
+  <header class="site-header">
+    <a class="brand" href="#start" aria-label="Amberflo — strona główna">
+      <img src="LOGO.png" alt="Amberflo">
+    </a>
+    <button class="menu-toggle" aria-expanded="false" aria-label="Otwórz menu"><span></span><span></span></button>
+    <nav class="main-nav" aria-label="Główna nawigacja">
+      <a href="#start" data-i18n="navHome">Start</a>
+      <a href="#sklep" data-i18n="navShop">Sklep</a>
+      <a href="#o-mnie" data-i18n="navAbout">O mnie</a>
+      <a href="#opinie" data-i18n="navReviews">Opinie</a>
+      <a href="#kontakt" data-i18n="navContact">Kontakt</a>
+    </nav>
+    <div class="header-actions">
+      <div class="language-switch" role="group" aria-label="Wybierz język">
+        <button class="lang-btn active" data-lang="pl" aria-label="Polski" title="Polski">🇵🇱</button>
+        <button class="lang-btn" data-lang="en" aria-label="English" title="English">🇬🇧</button>
+      </div>
+      <button class="cart-button" id="cartButton" aria-label="Otwórz koszyk">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h2l2.2 11h9.9l2-7H7M9 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm8 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"/></svg>
+        <span data-i18n="cart">Koszyk</span><b id="cartCount">0</b>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="start">
+      <div class="hero-glow"></div>
+      <div class="hero-copy reveal">
+        <p class="eyebrow" data-i18n="heroEyebrow">Bursztyn · drewno · ręce rzemieślnika</p>
+        <h1 data-i18n="heroTitle">Drzewka, które<br><em>niosą światło.</em></h1>
+        <p class="hero-lead" data-i18n="heroLead">Każde powstaje ręcznie z setek bryłek naturalnego bursztynu bałtyckiego. Nie ma dwóch takich samych.</p>
+        <div class="hero-buttons">
+          <a class="button button-primary" href="#sklep" data-i18n="seeCollection">Zobacz kolekcję</a>
+          <a class="text-link" href="#o-mnie"><span data-i18n="meetMaker">Poznaj twórcę</span> <b>↗</b></a>
+        </div>
+        <div class="hero-proof">
+          <div><strong>20</strong><span data-i18n="years">lat doświadczenia</span></div>
+          <div><strong>100%</strong><span data-i18n="balticAmber">bursztynu bałtyckiego</span></div>
+          <div><strong>5.0</strong><span data-i18n="customerRating">ocena klientów</span></div>
+        </div>
+      </div>
+      <div class="hero-visual reveal">
+        <div class="hero-image-wrap">
+          <img src="assets/drzewko-216-glowne.webp" alt="Ręcznie wykonane drzewko szczęścia z bursztynu">
+          <span class="orbit orbit-one"></span><span class="orbit orbit-two"></span>
+        </div>
+        <div class="hero-note"><span>✦</span><p><b data-i18n="handmade">Wykonane ręcznie</b><small data-i18n="uniqueBase">na unikalnej podstawie z drewna</small></p></div>
+      </div>
+      <a class="scroll-cue" href="#sklep" aria-label="Przewiń do sklepu"><span></span></a>
+    </section>
+
+    <section class="color-story">
+      <div class="color-intro reveal">
+        <p class="eyebrow" data-i18n="amberPalette">Paleta bursztynu</p>
+        <h2 data-i18n="chooseColor">Wybierz swoje światło</h2>
+        <p data-i18n="colorText">Od krystalicznej cytryny po głęboki wiśniowy — natura maluje każdą bryłkę inaczej.</p>
+      </div>
+      <div class="swatches" id="swatches"></div>
+    </section>
+
+    <section class="shop-section" id="sklep">
+      <div class="section-heading reveal">
+        <div><p class="eyebrow" data-i18n="collectionEyebrow">Kolekcja Amberflo</p><h2 data-i18n="shopTitle">Znajdź swoje drzewko</h2></div>
+        <p data-i18n="shopIntro">Ręcznie skręcane gałązki, naturalny bursztyn i podstawa z korzenia dębu lub egzotycznego mopani.</p>
+      </div>
+      <div class="filter-row" id="filterRow">
+        <button class="filter active" data-filter="all" data-i18n="all">Wszystkie</button>
+        <button class="filter" data-filter="small" data-i18n="small">Małe</button>
+        <button class="filter" data-filter="classic" data-i18n="classic">Klasyczne</button>
+        <button class="filter" data-filter="large" data-i18n="large">Duże</button>
+      </div>
+      <div class="product-grid" id="productGrid"></div>
+      <p class="source-note" data-i18n="priceNote">Ceny i opisy opracowane na podstawie aktualnych oraz archiwalnych ofert sprzedawcy marflorczak w Allegro. Dostępność potwierdzamy po złożeniu zamówienia.</p>
+    </section>
+
+    <section class="craft-banner reveal">
+      <div class="craft-number">432</div>
+      <div><p class="eyebrow light" data-i18n="inOneTree">W jednym drzewku</p><h2 data-i18n="piecesTitle">bryłki bursztynu<br>układane jedna po drugiej.</h2></div>
+      <p data-i18n="piecesText">To nie jest produkcja seryjna. Każdy pień, każda gałązka i każda bryłka przechodzi przez ręce Marcina.</p>
+    </section>
+
+    <section class="about-section" id="o-mnie">
+      <div class="about-photo reveal"><img src="Zdjęcie_profilowe.jpg" alt="Marcin, twórca Amberflo, przy dużym bursztynowym drzewie"><span class="photo-caption" data-i18n="largestTree">Największe drzewo: 220 cm</span></div>
+      <div class="about-copy reveal">
+        <p class="eyebrow" data-i18n="meetEyebrow">Poznaj twórcę</p>
+        <h2><span data-i18n="hello">Cześć, mam na imię</span><br><em>Marcin.</em></h2>
+        <p data-i18n="aboutP1">Od około 20 lat tworzę wyroby z drewna i bursztynu. Postanowiłem urzeczywistnić własne pomysły — od pierwszego szkicu aż po ostatnią bryłkę wszystko wykonuję samodzielnie.</p>
+        <p data-i18n="aboutP2">Największe wykonane przeze mnie drzewo ma 220 cm wysokości i dziś jest atrakcją dla turystów oraz mieszkańców Chin. Jeśli masz własny pomysł, razem stworzymy coś wyjątkowego i niepowtarzalnego.</p>
+        <a class="button button-dark" href="#kontakt" data-i18n="talkProject">Porozmawiajmy o projekcie</a>
+        <div class="signature">Marcin <span>— Amberflo</span></div>
+      </div>
+    </section>
+
+    <section class="reviews-section" id="opinie">
+      <div class="reviews-head reveal">
+        <div><p class="eyebrow" data-i18n="reviewsEyebrow">Wasze słowa</p><h2 data-i18n="reviewsTitle">Drzewka w nowych domach</h2></div>
+        <div class="rating-summary"><strong>5.0</strong><span>★★★★★</span><small data-i18n="basedOn">na podstawie opinii klientów</small></div>
+      </div>
+      <div class="reviews-grid" id="reviewsGrid"></div>
+      <button class="button button-outline" id="openReview" data-i18n="addReview">Dodaj swoją opinię</button>
+    </section>
+
+    <section class="contact-section" id="kontakt">
+      <div class="contact-copy reveal">
+        <p class="eyebrow light" data-i18n="contactEyebrow">Kontakt i zamówienia</p>
+        <h2 data-i18n="contactTitle">Stwórzmy coś<br>niepowtarzalnego.</h2>
+        <p data-i18n="contactLead">Masz pytanie, własny projekt lub zamówienie hurtowe? Zadzwoń albo napisz — chętnie pomogę.</p>
+        <div class="contact-links">
+          <a href="tel:+48601171813"><span>Telefon</span><b>+48 601 17 18 13</b></a>
+          <a href="mailto:biuroamberflo@gmail.com"><span>E-mail</span><b>biuroamberflo@gmail.com</b></a>
+          <div class="contact-hours"><span data-i18n="openingHours">Godziny otwarcia</span><b data-i18n="openingHoursValue">Poniedziałek–sobota: 8:00–16:00</b><small data-i18n="closedSunday">Niedziela: nieczynne</small></div>
+          <a href="https://share.google/VyxCHpI981VujpAzx" target="_blank" rel="noreferrer"><span data-i18n="location">Lokalizacja</span><b data-i18n="openMap">Otwórz w Mapach Google ↗</b></a>
+        </div>
+      </div>
+      <div class="order-info reveal">
+        <h3 data-i18n="orderInfo">Informacje do zamówienia</h3>
+        <div class="info-row"><span>01</span><p><b data-i18n="invoiceTitle">Paragon lub faktura VAT</b><small data-i18n="invoiceText">Dołączamy do każdego zamówienia.</small></p></div>
+        <div class="info-row"><span>02</span><p><b data-i18n="wholesaleTitle">Zamówienia hurtowe</b><small data-i18n="wholesaleText">Realizujemy serie dla firm i sklepów.</small></p></div>
+        <div class="bank-box"><small data-i18n="bankTransfer">Przelew tradycyjny · mBank</small><button class="copy-account" data-account="92114020040000310279681765">92 1140 2004 0000 3102 7968 1765 <span>⧉</span></button></div>
+      </div>
+      <div class="map-card reveal">
+        <iframe title="Lokalizacja firmy Amberflo" src="https://www.google.com/maps?q=Amberflo%20Marcin%20Florczak%2C%20Mzurki%2021A%2C%2097-371&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <div><span data-i18n="workshop">Pracownia Amberflo</span><b>Mzurki 21A, 97-371 Mzurki</b><a href="https://share.google/VyxCHpI981VujpAzx" target="_blank" rel="noreferrer" data-i18n="directions">Wyznacz trasę ↗</a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div><img src="LOGO.png" alt="Amberflo"><p data-i18n="footerLine">Ręcznie wykonane. Naturalnie niepowtarzalne.</p></div>
+    <nav><a href="#sklep" data-i18n="navShop">Sklep</a><a href="#o-mnie" data-i18n="navAbout">O mnie</a><a href="#opinie" data-i18n="navReviews">Opinie</a><a href="#kontakt" data-i18n="navContact">Kontakt</a></nav>
+    <nav class="legal-links"><a href="regulamin.html">Regulamin</a><a href="polityka-prywatnosci.html">Prywatność</a><a href="dostawa-i-zwroty.html">Dostawa i zwroty</a></nav>
+    <p>© <span id="year"></span> Amberflo</p>
+  </footer>
+
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <aside class="cart-drawer" id="cartDrawer" aria-hidden="true" aria-label="Koszyk">
+    <div class="drawer-head"><div><p class="eyebrow" data-i18n="yourCart">Twój koszyk</p><h2 data-i18n="selectedTreasures">Wybrane skarby</h2></div><button class="icon-button" id="closeCart" aria-label="Zamknij koszyk">×</button></div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-empty" id="cartEmpty"><span>◇</span><h3 data-i18n="emptyCart">Koszyk jest pusty</h3><p data-i18n="emptyText">Wybierz drzewko, które przyciągnęło Twój wzrok.</p></div>
+    <div class="cart-summary" id="cartSummary">
+      <div><span data-i18n="subtotal">Suma</span><strong id="cartTotal">0 zł</strong></div>
+      <small data-i18n="deliveryCalc">Koszt dostawy obliczymy przy zamówieniu.</small>
+      <button class="button button-primary full" id="checkoutButton" data-i18n="goCheckout">Przejdź do zamówienia</button>
+    </div>
+  </aside>
+
+  <dialog class="modal" id="productModal"><button class="modal-close" aria-label="Zamknij">×</button><div id="productModalContent"></div></dialog>
+  <dialog class="modal form-modal" id="reviewModal">
+    <button class="modal-close" aria-label="Zamknij">×</button>
+    <p class="eyebrow" data-i18n="yourOpinion">Twoja opinia</p><h2 data-i18n="shareExperience">Podziel się wrażeniami</h2>
+    <form id="reviewForm">
+      <label><span data-i18n="nameLabel">Imię</span><input name="name" required maxlength="50" autocomplete="name"></label>
+      <label><span data-i18n="emailLabel">E-mail (nie będzie widoczny)</span><input name="email" type="email" required autocomplete="email"></label>
+      <fieldset><legend data-i18n="ratingLabel">Ocena</legend><div class="star-input"><input type="radio" id="s5" name="rating" value="5" checked><label for="s5">★</label><input type="radio" id="s4" name="rating" value="4"><label for="s4">★</label><input type="radio" id="s3" name="rating" value="3"><label for="s3">★</label><input type="radio" id="s2" name="rating" value="2"><label for="s2">★</label><input type="radio" id="s1" name="rating" value="1"><label for="s1">★</label></div></fieldset>
+      <label><span data-i18n="reviewLabel">Treść opinii</span><textarea name="content" rows="5" required maxlength="700"></textarea></label>
+      <button class="button button-primary full" type="submit" data-i18n="sendReview">Wyślij opinię</button>
+      <p class="form-status" id="reviewStatus"></p>
+    </form>
+  </dialog>
+
+  <dialog class="modal form-modal checkout-modal" id="checkoutModal">
+    <button class="modal-close" aria-label="Zamknij">×</button>
+    <p class="eyebrow" data-i18n="checkoutEyebrow">Finalizacja</p><h2 data-i18n="orderTitle">Dane zamówienia</h2>
+    <form id="checkoutForm">
+      <div class="form-grid"><label><span data-i18n="nameLabel">Imię i nazwisko</span><input name="name" required autocomplete="name"></label><label><span data-i18n="phoneLabel">Telefon</span><input name="phone" required autocomplete="tel"></label></div>
+      <label><span>E-mail</span><input name="email" type="email" required autocomplete="email"></label>
+      <label><span data-i18n="addressLabel">Adres dostawy</span><textarea name="address" rows="3" required autocomplete="street-address"></textarea></label>
+      <label><span data-i18n="notesLabel">Uwagi / wybrany kolor bursztynu</span><textarea name="notes" rows="2"></textarea></label>
+      <fieldset><legend data-i18n="paymentLabel">Metoda płatności</legend><label class="payment-option"><input type="radio" name="payment" value="online" checked><span><b data-i18n="onlinePayment">Karta / BLIK / Przelewy24</b><small>Stripe Checkout</small></span></label><label class="payment-option"><input type="radio" name="payment" value="transfer"><span><b data-i18n="traditionalTransfer">Przelew tradycyjny</b><small>mBank · 92 1140 2004 0000 3102 7968 1765</small></span></label></fieldset>
+      <label class="legal-consent"><input type="checkbox" name="legal" required><span data-i18n="consentText">Akceptuję <a href="regulamin.html" target="_blank">regulamin</a> oraz zapoznałem/am się z <a href="polityka-prywatnosci.html" target="_blank">polityką prywatności</a> i zasadami <a href="dostawa-i-zwroty.html" target="_blank">dostaw i zwrotów</a>.</span></label>
+      <button class="button button-primary full" type="submit" data-i18n="placeOrder">Złóż zamówienie</button>
+      <p class="form-status" id="checkoutStatus"></p>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status"></div>
+</body>
+</html>

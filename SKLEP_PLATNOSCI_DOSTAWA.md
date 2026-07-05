@@ -84,6 +84,32 @@ SEND_CUSTOMER_EMAILS = true
 
 Wtedy potwierdzenie wysyłki będzie wysyłane automatycznie.
 
+## 6. Mapa Paczkomatów InPost
+
+1. Zaloguj się do `https://manager.paczkomaty.pl`.
+2. Otwórz **Moje konto → Dane** i uzupełnij dane firmy.
+3. Wejdź w **API → Geowidget → Wygeneruj**.
+4. Jeżeli panel zapyta o adres strony, podaj `https://marflorczak.github.io/Amberflo-store/`.
+5. Skopiuj publiczny token Geowidget i w pliku `config.js` wpisz go tak:
+
+```javascript
+inpostGeowidgetToken: "TU_WKLEJ_TOKEN"
+```
+
+Token Geowidget jest tokenem publicznym przeznaczonym do użycia na stronie. Nie wklejaj tutaj prywatnych kluczy API InPost. Bez tokenu klient nadal może ręcznie wpisać kod Paczkomatu.
+
+Po zmianach wdroż funkcje i stronę:
+
+```powershell
+npx.cmd supabase functions deploy create-checkout --project-ref mptzogdtgwymlmuqmtmo
+npx.cmd supabase functions deploy create-order --project-ref mptzogdtgwymlmuqmtmo
+npx.cmd supabase functions deploy stripe-webhook --no-verify-jwt --project-ref mptzogdtgwymlmuqmtmo
+git add .
+git commit -m "Naprawa Stripe i mapa Paczkomatow InPost"
+git pull --rebase origin main
+git push origin main
+```
+
 ## Koszty Stripe
 
 Stripe nie pobiera opłaty za założenie konta ani miesięcznego abonamentu w standardowym planie. Pobiera prowizję od udanych transakcji. Aktualny cennik dla Polski: https://stripe.com/en-pl/pricing

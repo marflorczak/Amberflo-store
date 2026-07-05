@@ -38,11 +38,60 @@ function updateShippingSummary(){
   const method=selectedShipping();const subtotal=productSubtotalCents();const shipping=subtotal>=50000?0:Number(method?.price_cents||0);
   const subtotalEl=document.querySelector('#checkoutProductsTotal');const shippingEl=document.querySelector('#checkoutShippingTotal');const totalEl=document.querySelector('#checkoutGrandTotal');
   if(subtotalEl)subtotalEl.textContent=shippingMoney(subtotal);if(shippingEl)shippingEl.textContent=shippingMoney(shipping);if(totalEl)totalEl.textContent=shippingMoney(subtotal+shipping);
+  updateShippingPointUi();
 }
+
+let inpostAssetsPromise;
+function updateShippingPointUi(){
+  const method=selectedShipping();const isInpost=method?.id==='inpost-paczkomat';const isDpdPickup=method?.id==='dpd-pickup';
+  const picker=document.querySelector('#inpostPointPicker');const pointInput=document.querySelector('#inpostPointName');const help=document.querySelector('#shippingHelp');const mapButton=document.querySelector('#openInpostMap');
+  if(picker)picker.hidden=!isInpost;if(pointInput)pointInput.required=isInpost;if(help)help.hidden=!isDpdPickup;
+  if(mapButton)mapButton.textContent=currentLang==='pl'?'Wybierz Paczkomat na mapie':'Choose a parcel locker on the map';
+}
+
+function loadInpostAssets(){
+  if(customElements.get('inpost-geowidget'))return Promise.resolve();
+  if(inpostAssetsPromise)return inpostAssetsPromise;
+  if(!document.querySelector('#inpostGeowidgetCss')){
+    const link=document.createElement('link');link.id='inpostGeowidgetCss';link.rel='stylesheet';link.href='https://geowidget.inpost.pl/inpost-geowidget.css';document.head.append(link);
+  }
+  inpostAssetsPromise=new Promise((resolve,reject)=>{
+    const existing=document.querySelector('#inpostGeowidgetScript');
+    if(existing){existing.addEventListener('load',resolve,{once:true});existing.addEventListener('error',reject,{once:true});return}
+    const script=document.createElement('script');script.id='inpostGeowidgetScript';script.src='https://geowidget.inpost.pl/inpost-geowidget.js';script.onload=resolve;script.onerror=()=>reject(new Error('Nie udało się wczytać mapy InPost.'));document.head.append(script);
+  });
+  return inpostAssetsPromise;
+}
+
+function inpostPointAddress(point){
+  const direct=[point?.address?.line1,point?.address?.line2].filter(Boolean).join(', ');if(direct)return direct;
+  const details=point?.address_details||{};return [[details.street,details.building_number].filter(Boolean).join(' '),[details.post_code,details.city].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+}
+
+function selectInpostPoint(point){
+  const name=String(point?.name||point?.location_code||'').trim();if(!name)return;
+  const address=inpostPointAddress(point);const nameInput=document.querySelector('#inpostPointName');const addressInput=document.querySelector('#inpostPointAddress');const summary=document.querySelector('#selectedInpostPoint');
+  if(nameInput)nameInput.value=name;if(addressInput)addressInput.value=address;if(summary)summary.innerHTML=`<strong>${shippingEscape(name)}</strong>${address?` · ${shippingEscape(address)}`:''}`;
+  document.querySelector('#inpostMapModal')?.close();
+}
+
+async function openInpostMap(){
+  const token=String(cfg.inpostGeowidgetToken||'').trim();const status=document.querySelector('#checkoutStatus');
+  if(!token){status.textContent=currentLang==='pl'?'Mapa Paczkomatów nie jest jeszcze aktywna. Wpisz kod Paczkomatu ręcznie.':'The parcel locker map is not active yet. Enter the locker code manually.';return}
+  const modal=document.querySelector('#inpostMapModal');const host=document.querySelector('#inpostMapHost');modal.showModal();host.innerHTML='<p>Wczytywanie mapy…</p>';
+  try{
+    await loadInpostAssets();host.replaceChildren();const widget=document.createElement('inpost-geowidget');widget.setAttribute('onpoint','amberfloInpostPointSelected');widget.setAttribute('token',token);widget.setAttribute('language',currentLang==='en'?'en':'pl');widget.setAttribute('config','parcelCollect');host.append(widget);
+  }catch(error){host.innerHTML=`<p>${shippingEscape(error.message||'Nie udało się wczytać mapy InPost.')}</p>`}
+}
+
+document.addEventListener('amberfloInpostPointSelected',event=>selectInpostPoint(event.detail||event.details||{}));
+document.querySelector('#openInpostMap')?.addEventListener('click',openInpostMap);
+document.querySelector('#inpostPointName')?.addEventListener('input',event=>{const address=document.querySelector('#inpostPointAddress');const summary=document.querySelector('#selectedInpostPoint');if(address)address.value='';if(summary)summary.textContent=event.target.value?`Wybrany kod: ${event.target.value}`:''});
 
 async function submitOrderWithShipping(form){
   const data=Object.fromEntries(new FormData(form));const items=cart.map(item=>({id:item.id,qty:item.qty}));const status=document.querySelector('#checkoutStatus');const button=form.querySelector('button[type="submit"]');
   if(!items.length){status.textContent=currentLang==='pl'?'Koszyk jest pusty.':'Your cart is empty.';return}
+  if(data.shipping_method==='inpost-paczkomat'&&!String(data.inpost_point_name||'').trim()){status.textContent=currentLang==='pl'?'Wybierz Paczkomat na mapie albo wpisz jego kod.':'Choose a parcel locker on the map or enter its code.';document.querySelector('#inpostPointName')?.focus();return}
   button.disabled=true;status.textContent=currentLang==='pl'?'Przygotowujemy zamówienie…':'Preparing your order…';
   const endpoint=data.payment==='online'?'create-checkout':'create-order';
   try{
@@ -50,7 +99,7 @@ async function submitOrderWithShipping(form){
     const result=await response.json();if(!response.ok)throw new Error(result.error||'Nie udało się utworzyć zamówienia.');
     if(data.payment==='online'){if(!result.url)throw new Error('Brak adresu płatności Stripe.');window.location.href=result.url;return}
     status.textContent=currentLang==='pl'?`Zamówienie ${result.orderId.slice(0,8).toUpperCase()} zostało przyjęte. Dane do przelewu znajdują się w sekcji Kontakt.`:`Order ${result.orderId.slice(0,8).toUpperCase()} has been received.`;
-    cart=[];saveCart();form.reset();renderShippingMethods();
+    cart=[];saveCart();form.reset();const pointSummary=document.querySelector('#selectedInpostPoint');if(pointSummary)pointSummary.textContent='';renderShippingMethods();
   }catch(error){status.textContent=error.message||'Nie udało się utworzyć zamówienia.'}
   finally{button.disabled=false}
 }

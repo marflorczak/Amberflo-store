@@ -34,7 +34,8 @@ serve(async req => {
     const customer = order.customer || {};
     const products = (order.items || []).map((item: { name: string; quantity: number; price: number }) => `<li>${esc(item.name)} × ${item.quantity} — ${(item.price * item.quantity / 100).toFixed(2)} zł</li>`).join("");
     const shipping = order.shipping_method || {};
-    const common = `<p><b>Numer zamówienia:</b> ${esc(order.id)}</p><ul>${products}</ul><p><b>Dostawa:</b> ${esc(shipping.name)} — ${(Number(order.shipping_cost || 0) / 100).toFixed(2)} zł</p><h2>Razem: ${(Number(order.total) / 100).toFixed(2)} zł</h2>`;
+    const point = customer.inpost_point_name ? `<p><b>Paczkomat:</b> ${esc(customer.inpost_point_name)}<br>${esc(customer.inpost_point_address)}</p>` : "";
+    const common = `<p><b>Numer zamówienia:</b> ${esc(order.id)}</p><ul>${products}</ul><p><b>Dostawa:</b> ${esc(shipping.name)} — ${(Number(order.shipping_cost || 0) / 100).toFixed(2)} zł</p>${point}<h2>Razem: ${(Number(order.total) / 100).toFixed(2)} zł</h2>`;
     const messages = [{ key: "owner", to: ownerEmail, subject: `Opłacone zamówienie Amberflo — ${customer.name}`, html: `<h1>Nowe opłacone zamówienie</h1>${common}<p><b>Klient:</b> ${esc(customer.name)}<br><b>Telefon:</b> ${esc(customer.phone)}<br><b>E-mail:</b> ${esc(customer.email)}</p><p><b>Adres:</b><br>${esc(customer.address).replace(/\n/g, "<br>")}</p><p><b>Uwagi:</b> ${esc(customer.notes)}</p>` }];
     if (sendCustomerEmails && customer.email) messages.push({ key: "customer", to: customer.email, subject: "Potwierdzenie zamówienia Amberflo", html: `<h1>Dziękujemy za zamówienie!</h1><p>Płatność została potwierdzona. Skontaktujemy się w sprawie realizacji i wysyłki.</p>${common}` });
     for (const message of messages) {

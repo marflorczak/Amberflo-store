@@ -26,6 +26,7 @@ serve(async req => {
 
     const { data: shipping, error: shippingError } = await supabase.from("shipping_methods").select("id,name_pl,name_en,price_cents,active").eq("id", String(shippingMethodId)).eq("active", true).single();
     if (shippingError || !shipping) throw new Error("Wybrana metoda dostawy jest niedostępna");
+    if (shipping.id === "inpost-paczkomat" && !String(customer.inpost_point_name || "").trim()) throw new Error("Wybierz Paczkomat InPost");
     const shippingName = language === "en" ? shipping.name_en : shipping.name_pl;
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("Płatności Stripe nie zostały jeszcze skonfigurowane");
@@ -40,7 +41,6 @@ serve(async req => {
       mode: "payment",
       customer_email: String(customer.email),
       locale: language === "en" ? "en" : "pl",
-      automatic_payment_methods: { enabled: true },
       line_items: lineItems,
       success_url: `${siteUrl}/?payment=success`,
       cancel_url: `${siteUrl}/?payment=cancelled`,
@@ -49,7 +49,7 @@ serve(async req => {
 
     const shippingMethod = { id: shipping.id, name: shippingName, name_pl: shipping.name_pl, name_en: shipping.name_en, price_cents: shippingCost };
     const total = productsTotal + shippingCost;
-    const safeCustomer = { name: String(customer.name), email: String(customer.email), phone: String(customer.phone || ""), address: String(customer.address), notes: String(customer.notes || "") };
+    const safeCustomer = { name: String(customer.name), email: String(customer.email), phone: String(customer.phone || ""), address: String(customer.address), notes: String(customer.notes || ""), inpost_point_name: String(customer.inpost_point_name || ""), inpost_point_address: String(customer.inpost_point_address || "") };
     const { error: orderError } = await supabase.from("orders").insert({ stripe_session_id: session.id, customer: safeCustomer, items: normalized, shipping_method: shippingMethod, shipping_cost: shippingCost, total, status: "awaiting_payment" });
     if (orderError) throw orderError;
     return new Response(JSON.stringify({ url: session.url }), { headers: { ...cors, "Content-Type": "application/json" } });

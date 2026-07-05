@@ -28,7 +28,7 @@ async function login(email,password){
 }
 function logout(){state.session=null;sessionStorage.removeItem('amberflo-admin-session');$('#adminView').hidden=true;$('#loginView').hidden=false;$('#loginForm').reset();setLoginStatus('')}
 async function showDashboard(){
-  $('#loginView').hidden=true;$('#adminView').hidden=false;$('#adminEmail').textContent=state.session.user.email;
+  setLoginStatus('');$('#loginView').hidden=true;$('#adminView').hidden=false;$('#adminEmail').textContent=state.session.user.email;
   await Promise.all([loadProducts(),loadReviews()]);
 }
 

@@ -16,8 +16,8 @@ function toast(message){const el=$('#adminToast');el.textContent=message;el.clas
 function setLoginStatus(message){$('#loginStatus').textContent=message||''}
 
 async function verifyAdmin(){
-  const rows=await api(`/rest/v1/admin_users?id=eq.${encodeURIComponent(state.session.user.id)}&select=id`);
-  if(!rows?.length)throw new Error('To konto nie ma uprawnień administratora.');
+  const allowed=await api('/rest/v1/rpc/is_admin',{method:'POST',body:'{}'});
+  if(allowed!==true)throw new Error('To konto nie ma uprawnień administratora.');
 }
 async function login(email,password){
   setLoginStatus('Sprawdzanie e-maila i hasła…');

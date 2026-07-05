@@ -26,17 +26,9 @@ footer>div img{width:130px;height:82px;object-fit:cover;object-position:center;f
   .cart-button{padding:8px}
 }
 
-/* Pełny pionowy kadr zdjęcia oraz wyśrodkowane podpisy palety. */
-.about-photo img{aspect-ratio:1/1.05;object-fit:cover;object-position:center}
+/* Wyśrodkowane podpisy palety. */
 .swatch{text-align:center}
 .swatch b{display:block;text-align:center}
 
-/* Zdjęcie pozostaje w pełnym kadrze, ale nie dominuje nad tekstem. */
-.about-section{grid-template-columns:minmax(320px,.8fr) minmax(0,1.2fr);gap:7vw}
-.about-photo{width:min(100%,440px);justify-self:center}
+/* Delikatne, naturalne cieniowanie próbek bursztynu. */
 .swatch-color{box-shadow:inset -10px -12px 22px rgba(112,67,0,.16)}
-
-@media(max-width:820px){
-  .about-section{grid-template-columns:1fr}
-  .about-photo{width:min(100%,420px)}
-}

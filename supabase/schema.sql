@@ -30,6 +30,9 @@ create table if not exists public.orders (
   total integer not null,
   currency text not null default 'pln',
   status text not null default 'created',
+  cancelled_at timestamptz,
+  cancellation_reason text,
+  cancellation_email_sent_at timestamptz,
   created_at timestamptz not null default now()
 );
 alter table public.orders enable row level security;

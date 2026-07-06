@@ -35,6 +35,9 @@ alter table public.orders add column if not exists tracking_number text;
 alter table public.orders add column if not exists tracking_url text;
 alter table public.orders add column if not exists shipped_at timestamptz;
 alter table public.orders add column if not exists payment_email_sent_at timestamptz;
+alter table public.orders add column if not exists cancelled_at timestamptz;
+alter table public.orders add column if not exists cancellation_reason text;
+alter table public.orders add column if not exists cancellation_email_sent_at timestamptz;
 alter table public.orders add column if not exists updated_at timestamptz not null default now();
 
 drop policy if exists "Admins can manage orders" on public.orders;

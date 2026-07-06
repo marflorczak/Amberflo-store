@@ -33,7 +33,7 @@ serve(async req => {
     let emailSent = false;
     if (resendKey && canEmailCustomer && customer.email) {
       const fromEmail = Deno.env.get("FROM_EMAIL") || "Amberflo <onboarding@resend.dev>";
-      const response = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json", "Idempotency-Key": `amberflo-shipped-${order.id}` }, body: JSON.stringify({ from: fromEmail, to: [customer.email], subject, html, text }) });
+      const response = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json", "Idempotency-Key": `amberflo-shipped-${order.id}` }, body: JSON.stringify({ from: fromEmail, to: [customer.email], reply_to: "biuroamberflo@gmail.com", subject, html, text }) });
       if (!response.ok) throw new Error(await response.text());emailSent = true;
     }
     const mailto = `mailto:${encodeURIComponent(customer.email || "")}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;

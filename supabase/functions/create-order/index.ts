@@ -47,10 +47,21 @@ serve(async req => {
     if (resendKey) {
       const ownerEmail = Deno.env.get("OWNER_EMAIL") || "biuroamberflo@gmail.com";
       const fromEmail = Deno.env.get("FROM_EMAIL") || "Amberflo <onboarding@resend.dev>";
+      const sendCustomerEmails = Deno.env.get("SEND_CUSTOMER_EMAILS") === "true";
       const productsHtml = normalized.map(item => `<li>${esc(item.name)} × ${item.quantity} — ${(item.price * item.quantity / 100).toFixed(2)} zł</li>`).join("");
       const pointHtml = safeCustomer.inpost_point_name ? `<p><b>Paczkomat:</b> ${esc(safeCustomer.inpost_point_name)}<br>${esc(safeCustomer.inpost_point_address)}</p>` : "";
       const documentHtml = safeCustomer.document_type === "invoice" ? `<p><b>Dokument:</b> Faktura VAT<br><b>Nabywca:</b> ${esc(safeCustomer.invoice_name)}<br><b>NIP:</b> ${esc(safeCustomer.tax_id)}<br><b>Adres do faktury:</b><br>${esc(safeCustomer.invoice_address).replace(/\n/g, "<br>")}</p>` : `<p><b>Dokument:</b> Paragon</p>`;
-      await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json", "Idempotency-Key": `amberflo-transfer-${order.id}` }, body: JSON.stringify({ from: fromEmail, to: [ownerEmail], subject: `Nowe zamówienie Amberflo — ${esc(safeCustomer.name)}`, html: `<h1>Nowe zamówienie — przelew tradycyjny</h1><p><b>Numer:</b> ${order.id}</p><p><b>Klient:</b> ${esc(safeCustomer.name)}<br><b>Telefon:</b> ${esc(safeCustomer.phone)}<br><b>E-mail:</b> ${esc(safeCustomer.email)}</p><p><b>Adres:</b><br>${esc(safeCustomer.address).replace(/\n/g, "<br>")}</p>${documentHtml}${pointHtml}<p><b>Dostawa:</b> ${esc(shippingName)} — ${(shippingCost / 100).toFixed(2)} zł</p><ul>${productsHtml}</ul><h2>Razem: ${(total / 100).toFixed(2)} zł</h2>` }) });
+      const orderShort = String(order.id).slice(0, 8).toUpperCase();
+      const commonHtml = `<p><b>Numer zamówienia:</b> #${orderShort}</p><ul>${productsHtml}</ul><p><b>Dostawa:</b> ${esc(shippingName)} — ${(shippingCost / 100).toFixed(2)} zł</p>${pointHtml}<h2>Razem: ${(total / 100).toFixed(2)} zł</h2>`;
+      const cancellationSubject = `Prośba o anulowanie zamówienia Amberflo #${orderShort}`;
+      const cancellationUrl = `mailto:biuroamberflo@gmail.com?subject=${encodeURIComponent(cancellationSubject)}&body=${encodeURIComponent(`Proszę o anulowanie zamówienia #${orderShort}.\n\nImię i nazwisko: ${safeCustomer.name}\nE-mail użyty w zamówieniu: ${safeCustomer.email}`)}`;
+      const cancellationBlock = `<hr style="margin:28px 0;border:0;border-top:1px solid #ead8c4"><p><b>Chcesz anulować zamówienie?</b><br>Wyślij prośbę możliwie szybko. Jeżeli zamówienie zostało już wysłane, anulowanie może nie być możliwe.</p><p><a href="${esc(cancellationUrl)}" style="display:inline-block;padding:12px 18px;background:#241914;color:#fff;text-decoration:none">Poproś o anulowanie zamówienia</a></p>`;
+      const messages = [{ key: "owner", to: ownerEmail, subject: `Nowe zamówienie Amberflo — ${safeCustomer.name}`, html: `<h1>Nowe zamówienie — przelew tradycyjny</h1>${commonHtml}<p><b>Klient:</b> ${esc(safeCustomer.name)}<br><b>Telefon:</b> ${esc(safeCustomer.phone)}<br><b>E-mail:</b> ${esc(safeCustomer.email)}</p><p><b>Adres:</b><br>${esc(safeCustomer.address).replace(/\n/g, "<br>")}</p>${documentHtml}` }];
+      if (sendCustomerEmails) messages.push({ key: "customer", to: safeCustomer.email, subject: `Przyjęliśmy zamówienie Amberflo #${orderShort}`, html: `<h1>Dziękujemy za zamówienie!</h1><p>Wybrano przelew tradycyjny. Zamówienie rozpoczniemy realizować po zaksięgowaniu płatności.</p>${commonHtml}<p><b>Dane do przelewu:</b><br>mBank<br>92 1140 2004 0000 3102 7968 1765<br><b>Tytuł:</b> Zamówienie #${orderShort}</p>${cancellationBlock}` });
+      for (const message of messages) {
+        const response = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json", "Idempotency-Key": `amberflo-transfer-${order.id}-${message.key}` }, body: JSON.stringify({ from: fromEmail, to: [message.to], reply_to: ownerEmail, subject: message.subject, html: message.html }) });
+        if (!response.ok) console.error("Resend:", await response.text());
+      }
     }
     return new Response(JSON.stringify({ orderId: order.id, total }), { headers: { ...cors, "Content-Type": "application/json" } });
   } catch (error) {

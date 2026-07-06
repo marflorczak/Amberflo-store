@@ -38,3 +38,9 @@ footer>div img{width:130px;height:82px;object-fit:cover;object-position:center;f
 
 /* Delikatne, naturalne cieniowanie próbek bursztynu. */
 .swatch-color{box-shadow:inset -10px -12px 22px rgba(112,67,0,.16)}
+
+/* Pełne dane firmy widoczne dla klientów i operatorów płatności. */
+.contact-hours,.contact-business{display:flex;flex-direction:column;padding:17px 0;border-bottom:1px solid #ffffff2b}
+.contact-hours span,.contact-business span{font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:#c7d1c0}
+.contact-hours small,.contact-business small{color:#d3dacb;font-size:12px}
+.footer-company-details{margin-top:10px!important;color:#b8aa9b;line-height:1.5}

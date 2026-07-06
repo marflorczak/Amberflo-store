@@ -35,6 +35,7 @@ i18n.pl.placeOrder = 'Kupuję i płacę';
 i18n.pl.openingHours = 'Godziny otwarcia';
 i18n.pl.openingHoursValue = 'Poniedziałek–sobota: 8:00–16:00';
 i18n.pl.closedSunday = 'Niedziela: nieczynne';
+i18n.pl.sellerDetails = 'Dane sprzedawcy';
 i18n.en.workshop = 'Amberflo workshop';
 i18n.en.announcement = 'Free delivery from PLN 300 · Handmade in Poland · Wholesale orders';
 i18n.en.notesPlaceholder = 'e.g. Colour mix / Lemon';
@@ -54,6 +55,7 @@ i18n.en.placeOrder = 'Order and pay';
 i18n.en.openingHours = 'Opening hours';
 i18n.en.openingHoursValue = 'Monday–Saturday: 8:00–16:00';
 i18n.en.closedSunday = 'Sunday: closed';
+i18n.en.sellerDetails = 'Seller details';
 
 let currentLang = localStorage.getItem('amberflo-lang') || 'pl';
 let cart = JSON.parse(localStorage.getItem('amberflo-cart') || '[]');

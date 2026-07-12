@@ -1,0 +1,19 @@
+.review-admin-photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+  margin: 14px 0 18px;
+}
+
+.review-admin-photos a {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.review-admin-photos img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}

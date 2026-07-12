@@ -5,9 +5,12 @@ create table if not exists public.reviews (
   email text not null check (char_length(email) between 5 and 200),
   rating smallint not null check (rating between 1 and 5),
   content text not null check (char_length(content) between 5 and 700),
+  images text[] not null default '{}',
   status text not null default 'pending' check (status in ('pending','approved','rejected')),
   created_at timestamptz not null default now()
 );
+
+alter table public.reviews add column if not exists images text[] not null default '{}';
 
 alter table public.reviews enable row level security;
 
@@ -111,6 +114,22 @@ for update to authenticated using (bucket_id = 'product-images' and public.is_ad
 drop policy if exists "Admins delete product images" on storage.objects;
 create policy "Admins delete product images" on storage.objects
 for delete to authenticated using (bucket_id = 'product-images' and public.is_admin());
+
+insert into storage.buckets (id, name, public)
+values ('review-images','review-images',true)
+on conflict (id) do update set public = true;
+
+drop policy if exists "Public review images" on storage.objects;
+create policy "Public review images" on storage.objects
+for select to public using (bucket_id = 'review-images');
+
+drop policy if exists "Public upload review images" on storage.objects;
+create policy "Public upload review images" on storage.objects
+for insert to anon with check (bucket_id = 'review-images');
+
+drop policy if exists "Admins delete review images" on storage.objects;
+create policy "Admins delete review images" on storage.objects
+for delete to authenticated using (bucket_id = 'review-images' and public.is_admin());
 
 insert into public.products (id,name_pl,name_en,description_pl,description_en,price,category,height,width,pieces,badge_pl,badge_en,main_image,gallery,active,sort_order) values
 ('szyszka-12','Bursztynowa szyszka','Amber pinecone','Mała forma, wielki blask. Stabilna drewniana podstawa.','A small form with a beautiful glow on a stable wooden base.',58,'small','11–12 cm','7–8 cm','50–60','Na dobry początek','A perfect start','647ee3324afdb8d8820013c96e59.webp',array['647ee3324afdb8d8820013c96e59.webp','ba20276641c2b6a262ec2b774fff.webp'],true,10),

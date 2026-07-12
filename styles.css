@@ -7,7 +7,15 @@
 .color-options{min-width:0}
 .color-guidance{margin:0 0 28px;padding:18px 20px;border-left:3px solid var(--amber);background:#f8eddc;color:var(--muted);font-size:12px}
 .color-guidance p{margin:0 0 8px}
-.color-guidance p:last-of-type{color:var(--ink);font-weight:600}
+  .color-guidance p:last-of-type{color:var(--ink);font-weight:600}
+
+.review-photo-field small{display:block;margin-top:6px;color:var(--muted);font-size:11px;font-weight:400;letter-spacing:0;text-transform:none}
+.review-photo-field input[type=file]{cursor:pointer}
+.review-photos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}
+.review-photos a{display:block;overflow:hidden;border:1px solid var(--line);background:#f4eadb}
+.review-photos img{width:100%;aspect-ratio:1;object-fit:cover;transition:.25s}
+.review-photos a:hover img{transform:scale(1.05)}
+@media(max-width:560px){.review-photos{grid-template-columns:repeat(2,1fr)}}
 .color-guidance ul{display:flex;flex-wrap:wrap;gap:6px 18px;margin:10px 0 0;padding:0;list-style:none;color:var(--ink)}
 .color-guidance li:before{content:'– ';color:var(--amber);font-weight:700}
 @media(max-width:560px){.swatches{grid-template-columns:repeat(2,1fr)}}

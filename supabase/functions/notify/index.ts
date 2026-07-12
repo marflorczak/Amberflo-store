@@ -20,9 +20,13 @@ serve(async req => {
 
     const isOrder = type === 'order';
     const subject = isOrder ? `Nowe zamówienie Amberflo — ${esc(payload.name)}` : `Nowa opinia Amberflo — ${esc(payload.name)}`;
+    const reviewImages = Array.isArray(payload.images) ? payload.images.filter(Boolean) : [];
+    const reviewImagesHtml = reviewImages.length
+      ? `<p><b>Zdjęcia:</b> ${reviewImages.length}</p><ul>${reviewImages.map((url: string, index: number) => `<li><a href="${esc(url)}">Zobacz zdjęcie ${index + 1}</a></li>`).join("")}</ul>`
+      : `<p><b>Zdjęcia:</b> brak</p>`;
     const html = isOrder
       ? `<h1>Nowe zamówienie</h1><p><b>Klient:</b> ${esc(payload.name)}</p><p><b>Telefon:</b> ${esc(payload.phone)}</p><p><b>E-mail:</b> ${esc(payload.email)}</p><p><b>Adres:</b><br>${esc(payload.address).replace(/\n/g,'<br>')}</p><p><b>Uwagi:</b> ${esc(payload.notes)}</p><pre>${esc(payload.summary)}</pre><h2>Razem: ${esc(payload.total)}</h2>`
-      : `<h1>Nowa opinia do zatwierdzenia</h1><p><b>Autor:</b> ${esc(payload.name)}</p><p><b>Ocena:</b> ${esc(payload.rating)}/5</p><blockquote>${esc(payload.content)}</blockquote><p><a href="${esc(adminUrl)}" style="display:inline-block;padding:12px 20px;background:#e88a0c;color:#fff;text-decoration:none">Otwórz panel opinii</a></p><p>W panelu Amberflo możesz zatwierdzić, odrzucić lub usunąć opinię.</p>`;
+      : `<h1>Nowa opinia do zatwierdzenia</h1><p><b>Autor:</b> ${esc(payload.name)}</p><p><b>Ocena:</b> ${esc(payload.rating)}/5</p><blockquote>${esc(payload.content)}</blockquote>${reviewImagesHtml}<p><a href="${esc(adminUrl)}" style="display:inline-block;padding:12px 20px;background:#e88a0c;color:#fff;text-decoration:none">Otwórz panel opinii</a></p><p>W panelu Amberflo możesz zatwierdzić, odrzucić lub usunąć opinię.</p>`;
 
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",

@@ -36,6 +36,8 @@ i18n.pl.openingHours = 'Godziny otwarcia';
 i18n.pl.openingHoursValue = 'Poniedziałek–sobota: 8:00–16:00';
 i18n.pl.closedSunday = 'Niedziela: nieczynne';
 i18n.pl.sellerDetails = 'Dane sprzedawcy';
+i18n.pl.reviewPhotosLabel = 'Zdjęcia do opinii';
+i18n.pl.reviewPhotosHint = 'Możesz dodać maksymalnie 4 zdjęcia: JPG, PNG, WEBP, GIF lub AVIF. Jedno zdjęcie maks. 8 MB.';
 i18n.en.workshop = 'Amberflo workshop';
 i18n.en.announcement = 'Free delivery from PLN 300 · Handmade in Poland · Wholesale orders';
 i18n.en.notesPlaceholder = 'e.g. Colour mix / Lemon';
@@ -56,6 +58,8 @@ i18n.en.openingHours = 'Opening hours';
 i18n.en.openingHoursValue = 'Monday–Saturday: 8:00–16:00';
 i18n.en.closedSunday = 'Sunday: closed';
 i18n.en.sellerDetails = 'Seller details';
+i18n.en.reviewPhotosLabel = 'Review photos';
+i18n.en.reviewPhotosHint = 'You can add up to 4 photos: JPG, PNG, WEBP, GIF or AVIF. One photo max. 8 MB.';
 
 let currentLang = localStorage.getItem('amberflo-lang') || 'pl';
 let cart = JSON.parse(localStorage.getItem('amberflo-cart') || '[]');
@@ -82,7 +86,6 @@ async function loadCatalog(){
 function renderSwatches(){ $('#swatches').innerHTML=colors.map(c=>`<div class="swatch"><div class="swatch-color" style="background:${c[0]}"></div><b>${currentLang==='pl'?c[1]:c[2]}</b></div>`).join(''); }
 function renderProducts(){ const visible=products.filter(p=>activeFilter==='all'||p.category===activeFilter); $('#productGrid').innerHTML=visible.map(p=>`<article class="product-card"><div class="product-image" data-detail="${p.id}" role="button" tabindex="0"><span class="product-badge">${p.badge[currentLang]}</span><img src="${p.image}" alt="${p.name[currentLang]}" loading="lazy"></div><div class="product-info"><div class="product-meta"><span>${p.height}</span><span>${p.pieces} ${currentLang==='pl'?'bryłek':'stones'}</span></div><h3>${p.name[currentLang]}</h3><p class="product-description">${p.desc[currentLang]}</p><div class="product-bottom"><strong class="price">${money(p.price)}</strong><button class="add-cart" data-add="${p.id}" aria-label="${t('addToCart')}">+</button></div></div></article>`).join(''); }
 function updateI18n(){ document.documentElement.lang=currentLang; document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.dataset.i18n;if(i18n[currentLang][key])el.innerHTML=i18n[currentLang][key]}); document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const key=el.dataset.i18nPlaceholder;if(i18n[currentLang][key])el.placeholder=i18n[currentLang][key]}); document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLang)); renderSwatches();renderProducts();renderReviews();renderCart(); }
-function renderReviews(){ let local=JSON.parse(localStorage.getItem('amberflo-reviews')||'[]').filter(r=>r.status==='approved'); let reviews=[...seedReviews,...local]; $('#reviewsGrid').innerHTML=reviews.slice(0,6).map(r=>`<article class="review-card"><div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div><blockquote>${typeof r.content==='object'?r.content[currentLang]:`“${escapeHtml(r.content)}”`}</blockquote><footer><b>${escapeHtml(r.name)}</b><small>${r.date||''}</small></footer></article>`).join(''); }
 function escapeHtml(s=''){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
 function addToCart(id){ const found=cart.find(x=>x.id===id);found?found.qty++:cart.push({id,qty:1});saveCart();toast(t('added')); }
 function saveCart(){localStorage.setItem('amberflo-cart',JSON.stringify(cart));renderCart();}
@@ -100,10 +103,73 @@ function updateGallery(index){
   document.querySelectorAll('[data-gallery-index]').forEach((button,i)=>button.classList.toggle('active',i===activeGalleryIndex));
 }
 function openProduct(id){const p=products.find(x=>x.id===id);activeGallery=p.gallery?.length?p.gallery:[p.image];activeGalleryIndex=0;const arrows=activeGallery.length>1?`<button class="gallery-arrow prev" data-gallery-nav="-1" aria-label="${currentLang==='pl'?'Poprzednie zdjęcie':'Previous image'}">‹</button><button class="gallery-arrow next" data-gallery-nav="1" aria-label="${currentLang==='pl'?'Następne zdjęcie':'Next image'}">›</button>`:'';const thumbs=activeGallery.length>1?`<div class="gallery-thumbs">${activeGallery.map((src,i)=>`<button class="gallery-thumb ${i===0?'active':''}" data-gallery-index="${i}" aria-label="${currentLang==='pl'?'Pokaż zdjęcie':'Show image'} ${i+1}"><img src="${src}" alt=""></button>`).join('')}</div>`:'';$('#productModalContent').innerHTML=`<div class="product-modal-grid"><div class="product-gallery"><div class="gallery-stage"><img id="modalGalleryImage" src="${activeGallery[0]}" alt="${p.name[currentLang]}">${arrows}<span class="gallery-counter" id="galleryCounter">1 / ${activeGallery.length}</span></div>${thumbs}</div><div class="product-modal-copy"><p class="eyebrow">Amberflo · ${p.badge[currentLang]}</p><h2>${p.name[currentLang]}</h2><p>${p.desc[currentLang]} ${currentLang==='pl'?'Każdy egzemplarz jest wykonywany ręcznie, dlatego podstawa i układ gałązek mogą delikatnie różnić się od zdjęcia.':'Each piece is handmade, so the base and arrangement of branches may vary slightly from the photo.'}</p><div class="specs"><div><span>${t('height')}</span><b>${p.height}</b></div><div><span>${t('pieces')}</span><b>${p.pieces}</b></div><div><span>${t('width')}</span><b>${p.width}</b></div><div><span>${t('material')}</span><b>${t('materialValue')}</b></div></div><p class="gallery-note">${currentLang==='pl'?'Zdjęcia przedstawiają dostępne, ręcznie wykonane warianty. Naturalna podstawa i układ bursztynu są unikatowe.':'Photos show available handmade variants. The natural base and amber arrangement are unique.'}</p><p class="modal-price">${money(p.price)}</p><button class="button button-primary full" data-modal-add="${p.id}">${t('addToCart')}</button></div></div>`;$('#productModal').showModal();}
-async function submitReview(form){const data=Object.fromEntries(new FormData(form));const payload={name:data.name,email:data.email,rating:Number(data.rating),content:data.content,status:'pending'};const status=$('#reviewStatus');status.textContent='…';try{if(cfg.supabaseUrl&&cfg.supabaseAnonKey){const res=await fetch(`${cfg.supabaseUrl}/rest/v1/reviews`,{method:'POST',headers:{apikey:cfg.supabaseAnonKey,Authorization:`Bearer ${cfg.supabaseAnonKey}`,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(payload)});if(!res.ok)throw new Error('Supabase');const notification=await fetch(`${cfg.supabaseUrl}/functions/v1/notify`,{method:'POST',headers:{apikey:cfg.supabaseAnonKey,Authorization:`Bearer ${cfg.supabaseAnonKey}`,'Content-Type':'application/json'},body:JSON.stringify({type:'review',payload:{name:payload.name,rating:payload.rating,content:payload.content}})});if(!notification.ok)console.warn('Powiadomienie e-mail nie zostało wysłane:',await notification.text());}else{const saved=JSON.parse(localStorage.getItem('amberflo-reviews')||'[]');saved.push({...payload,date:new Date().getFullYear()});localStorage.setItem('amberflo-reviews',JSON.stringify(saved));}status.textContent=t('reviewThanks');form.reset();}catch(e){status.textContent=currentLang==='pl'?'Nie udało się wysłać opinii. Spróbuj ponownie.':'Could not send your review. Please try again.';}}
 async function submitOrder(form){const data=Object.fromEntries(new FormData(form));const items=cart.map(x=>({id:x.id,qty:x.qty}));const status=$('#checkoutStatus');status.textContent='…';if(data.payment==='online'){if(!cfg.supabaseUrl||!cfg.supabaseAnonKey){status.textContent=t('configNeeded');return}try{const res=await fetch(`${cfg.supabaseUrl}/functions/v1/create-checkout`,{method:'POST',headers:{Authorization:`Bearer ${cfg.supabaseAnonKey}`,'Content-Type':'application/json'},body:JSON.stringify({customer:data,items,language:currentLang})});const out=await res.json();if(!res.ok||!out.url)throw new Error(out.error||'Checkout');window.location.href=out.url;}catch(e){status.textContent=currentLang==='pl'?'Nie udało się uruchomić płatności. Spróbuj ponownie.':'Could not start payment. Please try again.';}return}
   const lines=cart.map(x=>{const p=products.find(z=>z.id===x.id);return`${p.name.pl} × ${x.qty} — ${money(p.price*x.qty)}`}).join('\n');const total=money(cart.reduce((s,x)=>s+products.find(p=>p.id===x.id).price*x.qty,0));const body=`NOWE ZAMÓWIENIE AMBERFLO\n\nKlient: ${data.name}\nTelefon: ${data.phone}\nE-mail: ${data.email}\nAdres: ${data.address}\nUwagi: ${data.notes||'-'}\n\n${lines}\n\nSuma: ${total}\nPłatność: przelew tradycyjny`;if(cfg.supabaseUrl&&cfg.supabaseAnonKey){try{await fetch(`${cfg.supabaseUrl}/functions/v1/notify`,{method:'POST',headers:{Authorization:`Bearer ${cfg.supabaseAnonKey}`,'Content-Type':'application/json'},body:JSON.stringify({type:'order',payload:{...data,items,summary:lines,total}})});status.textContent=t('orderSaved');cart=[];saveCart();return}catch(e){}}
   status.textContent=t('emailOrder');window.location.href=`mailto:biuroamberflo@gmail.com?subject=${encodeURIComponent('Nowe zamówienie Amberflo')}&body=${encodeURIComponent(body)}`;
+}
+
+const REVIEW_IMAGE_BUCKET = 'review-images';
+const REVIEW_IMAGE_LIMIT = 4;
+const REVIEW_IMAGE_MAX_SIZE = 8 * 1024 * 1024;
+const REVIEW_IMAGE_TYPES = ['image/jpeg','image/png','image/webp','image/gif','image/avif'];
+
+function reviewImages(review){
+  return Array.isArray(review.images) ? review.images.filter(Boolean) : [];
+}
+
+function reviewImageGrid(images){
+  if(!images.length)return '';
+  return `<div class="review-photos">${images.map((src,index)=>`<a href="${escapeHtml(src)}" target="_blank" rel="noreferrer" aria-label="${currentLang==='pl'?'Otwórz zdjęcie opinii':'Open review photo'} ${index+1}"><img src="${escapeHtml(src)}" alt="${currentLang==='pl'?'Zdjęcie dodane do opinii':'Photo added to review'} ${index+1}" loading="lazy"></a>`).join('')}</div>`;
+}
+
+function renderReviews(){
+  let local=JSON.parse(localStorage.getItem('amberflo-reviews')||'[]').filter(r=>r.status==='approved');
+  let reviews=[...seedReviews,...local];
+  $('#reviewsGrid').innerHTML=reviews.slice(0,6).map(r=>`<article class="review-card"><div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div><blockquote>${typeof r.content==='object'?r.content[currentLang]:`“${escapeHtml(r.content)}”`}</blockquote>${reviewImageGrid(reviewImages(r))}<footer><b>${escapeHtml(r.name)}</b><small>${r.date||''}</small></footer></article>`).join('');
+}
+
+function reviewFileName(file){
+  const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
+  const base=file.name.replace(/\.[^.]+$/,'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,45)||'zdjecie-opinii';
+  return `${Date.now()}-${Math.random().toString(36).slice(2,8)}-${base}.${ext}`;
+}
+
+async function uploadReviewImage(file){
+  const path=`pending/${reviewFileName(file)}`;
+  const encoded=path.split('/').map(encodeURIComponent).join('/');
+  const response=await fetch(`${cfg.supabaseUrl}/storage/v1/object/${REVIEW_IMAGE_BUCKET}/${encoded}`,{method:'POST',headers:{apikey:cfg.supabaseAnonKey,Authorization:`Bearer ${cfg.supabaseAnonKey}`,'Content-Type':file.type||'application/octet-stream','x-upsert':'false'},body:file});
+  if(!response.ok){const body=await response.json().catch(()=>({}));throw new Error(body.message||`Nie udało się wysłać zdjęcia: ${file.name}`)}
+  return `${cfg.supabaseUrl}/storage/v1/object/public/${REVIEW_IMAGE_BUCKET}/${encoded}`;
+}
+
+async function submitReview(form){
+  const data=Object.fromEntries(new FormData(form));
+  const files=[...(form.elements.photos?.files||[])];
+  const status=$('#reviewStatus');
+  status.textContent='…';
+  try{
+    if(files.length>REVIEW_IMAGE_LIMIT)throw new Error(`Możesz dodać maksymalnie ${REVIEW_IMAGE_LIMIT} zdjęcia.`);
+    for(const file of files){
+      if(!REVIEW_IMAGE_TYPES.includes(file.type))throw new Error(`Plik ${file.name} ma nieobsługiwany format. Dodaj JPG, PNG, WEBP, GIF albo AVIF.`);
+      if(file.size>REVIEW_IMAGE_MAX_SIZE)throw new Error(`Plik ${file.name} jest większy niż 8 MB.`);
+    }
+    const images=cfg.supabaseUrl&&cfg.supabaseAnonKey?await Promise.all(files.map(uploadReviewImage)):[];
+    const payload={name:data.name,email:data.email,rating:Number(data.rating),content:data.content,status:'pending',images};
+    if(cfg.supabaseUrl&&cfg.supabaseAnonKey){
+      const res=await fetch(`${cfg.supabaseUrl}/rest/v1/reviews`,{method:'POST',headers:{apikey:cfg.supabaseAnonKey,Authorization:`Bearer ${cfg.supabaseAnonKey}`,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(payload)});
+      if(!res.ok)throw new Error('Supabase');
+      const notification=await fetch(`${cfg.supabaseUrl}/functions/v1/notify`,{method:'POST',headers:{apikey:cfg.supabaseAnonKey,Authorization:`Bearer ${cfg.supabaseAnonKey}`,'Content-Type':'application/json'},body:JSON.stringify({type:'review',payload:{name:payload.name,rating:payload.rating,content:payload.content,images}})});
+      if(!notification.ok)console.warn('Powiadomienie e-mail nie zostało wysłane:',await notification.text());
+    }else{
+      const saved=JSON.parse(localStorage.getItem('amberflo-reviews')||'[]');
+      saved.push({...payload,date:new Date().getFullYear()});
+      localStorage.setItem('amberflo-reviews',JSON.stringify(saved));
+    }
+    status.textContent=t('reviewThanks');
+    form.reset();
+  }catch(e){
+    status.textContent=e.message || (currentLang==='pl'?'Nie udało się wysłać opinii. Spróbuj ponownie.':'Could not send your review. Please try again.');
+  }
 }
 
 document.addEventListener('click',e=>{
@@ -136,4 +202,4 @@ if(paymentResult === 'success'){
 }
 
 // Pobierz tylko zatwierdzone opinie. Gdy Supabase nie jest skonfigurowany, działają opinie demonstracyjne.
-if(cfg.supabaseUrl&&cfg.supabaseAnonKey)fetch(`${cfg.supabaseUrl}/rest/v1/reviews?status=eq.approved&select=name,rating,content,created_at&order=created_at.desc&limit=6`,{headers:{apikey:cfg.supabaseAnonKey,Authorization:`Bearer ${cfg.supabaseAnonKey}`}}).then(r=>r.ok?r.json():[]).then(rows=>{if(rows.length){rows.forEach(r=>r.date=new Date(r.created_at).getFullYear());localStorage.setItem('amberflo-reviews',JSON.stringify(rows.map(r=>({...r,status:'approved'}))));renderReviews()}}).catch(()=>{});
+if(cfg.supabaseUrl&&cfg.supabaseAnonKey)fetch(`${cfg.supabaseUrl}/rest/v1/reviews?status=eq.approved&select=name,rating,content,images,created_at&order=created_at.desc&limit=6`,{headers:{apikey:cfg.supabaseAnonKey,Authorization:`Bearer ${cfg.supabaseAnonKey}`}}).then(r=>r.ok?r.json():[]).then(rows=>{if(rows.length){rows.forEach(r=>r.date=new Date(r.created_at).getFullYear());localStorage.setItem('amberflo-reviews',JSON.stringify(rows.map(r=>({...r,status:'approved'}))));renderReviews()}}).catch(()=>{});

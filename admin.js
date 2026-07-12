@@ -39,9 +39,34 @@ function renderProducts(){
 }
 
 async function loadReviews(){try{state.reviews=await api('/rest/v1/reviews?select=*&order=created_at.desc');renderReviews()}catch{state.reviews=[];renderReviews()}}
+
+function reviewImages(review){
+  return Array.isArray(review.images) ? review.images.filter(Boolean) : [];
+}
+
+function reviewImageGrid(images){
+  if(!images.length)return '';
+  return `<div class="review-admin-photos">${images.map((src,index)=>`<a href="${escapeHtml(src)}" target="_blank" rel="noreferrer" title="Otwórz zdjęcie ${index+1}"><img src="${escapeHtml(src)}" alt="Zdjęcie opinii ${index+1}" loading="lazy"></a>`).join('')}</div>`;
+}
+
+function reviewStoragePath(url){
+  const marker='/storage/v1/object/public/review-images/';
+  const index=String(url||'').indexOf(marker);
+  if(index<0)return '';
+  return decodeURIComponent(String(url).slice(index+marker.length));
+}
+
+async function deleteReviewImages(review){
+  const paths=reviewImages(review).map(reviewStoragePath).filter(Boolean);
+  await Promise.all(paths.map(path=>{
+    const encoded=path.split('/').map(encodeURIComponent).join('/');
+    return fetch(`${config.supabaseUrl}/storage/v1/object/review-images/${encoded}`,{method:'DELETE',headers:authHeaders(false)}).catch(()=>null);
+  }));
+}
+
 function renderReviews(){
   const pending=state.reviews.filter(review=>review.status==='pending').length;$('#reviewCount').textContent=pending;
-  $('#adminReviews').innerHTML=state.reviews.length?state.reviews.map(review=>`<article class="review-admin-card"><header><div><b>${escapeHtml(review.name)}</b> · ${'★'.repeat(Number(review.rating)||0)}</div><small>${new Date(review.created_at).toLocaleDateString('pl-PL')} · ${escapeHtml(review.status)}</small></header><p>${escapeHtml(review.content)}</p><footer>${review.status!=='approved'?`<button class="approve" data-review-status="approved" data-review-id="${review.id}">Zatwierdź</button>`:''}${review.status!=='rejected'?`<button class="reject" data-review-status="rejected" data-review-id="${review.id}">Odrzuć</button>`:''}<button data-delete-review="${review.id}">Usuń</button></footer></article>`).join(''):'<div class="empty-admin">Nie ma jeszcze opinii.</div>';
+  $('#adminReviews').innerHTML=state.reviews.length?state.reviews.map(review=>`<article class="review-admin-card"><header><div><b>${escapeHtml(review.name)}</b> · ${'★'.repeat(Number(review.rating)||0)}</div><small>${new Date(review.created_at).toLocaleDateString('pl-PL')} · ${escapeHtml(review.status)}</small></header><p>${escapeHtml(review.content)}</p>${reviewImageGrid(reviewImages(review))}<footer>${review.status!=='approved'?`<button class="approve" data-review-status="approved" data-review-id="${review.id}">Zatwierdź</button>`:''}${review.status!=='rejected'?`<button class="reject" data-review-status="rejected" data-review-id="${review.id}">Odrzuć</button>`:''}<button data-delete-review="${review.id}">Usuń</button></footer></article>`).join(''):'<div class="empty-admin">Nie ma jeszcze opinii.</div>';
 }
 
 function fillForm(product){
@@ -83,7 +108,7 @@ document.addEventListener('click',async event=>{
   const main=event.target.closest('[data-main-image]');if(main){state.mainImage=state.gallery[Number(main.dataset.mainImage)];renderGalleryEditor()}
   const del=event.target.closest('[data-delete-product]');if(del&&confirm('Usunąć ten produkt na stałe?')){await api(`/rest/v1/products?id=eq.${encodeURIComponent(del.dataset.deleteProduct)}`,{method:'DELETE'});await loadProducts();toast('Produkt usunięty.')}
   const reviewStatus=event.target.closest('[data-review-status]');if(reviewStatus){await api(`/rest/v1/reviews?id=eq.${reviewStatus.dataset.reviewId}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({status:reviewStatus.dataset.reviewStatus})});await loadReviews();toast('Status opinii zmieniony.')}
-  const deleteReview=event.target.closest('[data-delete-review]');if(deleteReview&&confirm('Usunąć opinię na stałe?')){await api(`/rest/v1/reviews?id=eq.${deleteReview.dataset.deleteReview}`,{method:'DELETE'});await loadReviews();toast('Opinia usunięta.')}
+  const deleteReview=event.target.closest('[data-delete-review]');if(deleteReview&&confirm('Usunąć opinię na stałe?')){const review=state.reviews.find(item=>String(item.id)===String(deleteReview.dataset.deleteReview));if(review)await deleteReviewImages(review);await api(`/rest/v1/reviews?id=eq.${deleteReview.dataset.deleteReview}`,{method:'DELETE'});await loadReviews();toast('Opinia usunięta.')}
 });
 
 $('#loginForm').addEventListener('submit',async event=>{event.preventDefault();const button=event.target.querySelector('button[type="submit"]');button.disabled=true;const data=new FormData(event.target);try{await login(data.get('email'),data.get('password'))}catch(error){state.session=null;setLoginStatus(error.message)}finally{button.disabled=false}});

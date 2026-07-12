@@ -183,6 +183,23 @@ async function submitReview(form){
   }
 }
 
+const submitReviewBase = submitReview;
+submitReview = async function(form){
+  const textarea=form.elements.content;
+  const status=$('#reviewStatus');
+  if(textarea)textarea.value=String(textarea.value||'').trim();
+  const content=textarea?textarea.value:'';
+  if(content.length<5){
+    status.textContent='Wpisz treść opinii — minimum 5 znaków.';
+    return;
+  }
+  if(content.length>700){
+    status.textContent='Treść opinii może mieć maksymalnie 700 znaków.';
+    return;
+  }
+  return submitReviewBase(form);
+};
+
 document.addEventListener('click',e=>{
   const add=e.target.closest('[data-add],[data-modal-add]');if(add){addToCart(add.dataset.add||add.dataset.modalAdd);if(add.dataset.modalAdd)$('#productModal').close()}
   const detail=e.target.closest('[data-detail]');if(detail)openProduct(detail.dataset.detail);

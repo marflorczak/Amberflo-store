@@ -90,7 +90,7 @@
   <link rel="stylesheet" href="shipping.css?v=4">
   <script src="config.js?v=5" defer></script>
   <script src="products.js" defer></script>
-  <script src="app.js?v=15" defer></script>
+  <script src="app.js?v=16" defer></script>
   <script src="shipping.js?v=4" defer></script>
 </head>
 <body>
@@ -262,7 +262,7 @@
       <label><span data-i18n="nameLabel">Imię</span><input name="name" required maxlength="50" autocomplete="name"></label>
       <label><span data-i18n="emailLabel">E-mail (nie będzie widoczny)</span><input name="email" type="email" required autocomplete="email"></label>
       <fieldset><legend data-i18n="ratingLabel">Ocena</legend><div class="star-input"><input type="radio" id="s5" name="rating" value="5" checked><label for="s5">★</label><input type="radio" id="s4" name="rating" value="4"><label for="s4">★</label><input type="radio" id="s3" name="rating" value="3"><label for="s3">★</label><input type="radio" id="s2" name="rating" value="2"><label for="s2">★</label><input type="radio" id="s1" name="rating" value="1"><label for="s1">★</label></div></fieldset>
-      <label><span data-i18n="reviewLabel">Treść opinii</span><textarea name="content" rows="5" required maxlength="700"></textarea></label>
+      <label><span data-i18n="reviewLabel">Treść opinii</span><textarea name="content" rows="5" required minlength="5" maxlength="700"></textarea></label>
       <label class="review-photo-field"><span data-i18n="reviewPhotosLabel">Zdjęcia do opinii</span><input name="photos" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" multiple><small data-i18n="reviewPhotosHint">Możesz dodać maksymalnie 4 zdjęcia: JPG, PNG, WEBP, GIF lub AVIF. Jedno zdjęcie maks. 8 MB.</small></label>
       <button class="button button-primary full" type="submit" data-i18n="sendReview">Wyślij opinię</button>
       <p class="form-status" id="reviewStatus"></p>

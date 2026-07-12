@@ -138,7 +138,12 @@ async function uploadReviewImage(file){
   const path=`pending/${reviewFileName(file)}`;
   const encoded=path.split('/').map(encodeURIComponent).join('/');
   const response=await fetch(`${cfg.supabaseUrl}/storage/v1/object/${REVIEW_IMAGE_BUCKET}/${encoded}`,{method:'POST',headers:{apikey:cfg.supabaseAnonKey,Authorization:`Bearer ${cfg.supabaseAnonKey}`,'Content-Type':file.type||'application/octet-stream','x-upsert':'false'},body:file});
-  if(!response.ok){const body=await response.json().catch(()=>({}));throw new Error(body.message||`Nie udało się wysłać zdjęcia: ${file.name}`)}
+  if(!response.ok){
+    const body=await response.json().catch(()=>({}));
+    const message=body.message||body.error||'';
+    if(/bucket|not found|row-level security|policy/i.test(message))throw new Error('Zdjęcia opinii nie są jeszcze włączone w Supabase. Uruchom plik supabase/review-images-upgrade.sql w SQL Editorze.');
+    throw new Error(message||`Nie udało się wysłać zdjęcia: ${file.name}`);
+  }
   return `${cfg.supabaseUrl}/storage/v1/object/public/${REVIEW_IMAGE_BUCKET}/${encoded}`;
 }
 
@@ -155,9 +160,15 @@ async function submitReview(form){
     }
     const images=cfg.supabaseUrl&&cfg.supabaseAnonKey?await Promise.all(files.map(uploadReviewImage)):[];
     const payload={name:data.name,email:data.email,rating:Number(data.rating),content:data.content,status:'pending',images};
+    if(!images.length)delete payload.images;
     if(cfg.supabaseUrl&&cfg.supabaseAnonKey){
       const res=await fetch(`${cfg.supabaseUrl}/rest/v1/reviews`,{method:'POST',headers:{apikey:cfg.supabaseAnonKey,Authorization:`Bearer ${cfg.supabaseAnonKey}`,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(payload)});
-      if(!res.ok)throw new Error('Supabase');
+      if(!res.ok){
+        const body=await res.json().catch(()=>({}));
+        const message=body.message||body.details||body.hint||body.error||'';
+        if(/images|schema cache|column/i.test(message))throw new Error('Baza Supabase nie ma jeszcze pola na zdjęcia opinii. Uruchom plik supabase/review-images-upgrade.sql w SQL Editorze.');
+        throw new Error(message||'Nie udało się zapisać opinii w Supabase.');
+      }
       const notification=await fetch(`${cfg.supabaseUrl}/functions/v1/notify`,{method:'POST',headers:{apikey:cfg.supabaseAnonKey,Authorization:`Bearer ${cfg.supabaseAnonKey}`,'Content-Type':'application/json'},body:JSON.stringify({type:'review',payload:{name:payload.name,rating:payload.rating,content:payload.content,images}})});
       if(!notification.ok)console.warn('Powiadomienie e-mail nie zostało wysłane:',await notification.text());
     }else{
@@ -202,4 +213,20 @@ if(paymentResult === 'success'){
 }
 
 // Pobierz tylko zatwierdzone opinie. Gdy Supabase nie jest skonfigurowany, działają opinie demonstracyjne.
-if(cfg.supabaseUrl&&cfg.supabaseAnonKey)fetch(`${cfg.supabaseUrl}/rest/v1/reviews?status=eq.approved&select=name,rating,content,images,created_at&order=created_at.desc&limit=6`,{headers:{apikey:cfg.supabaseAnonKey,Authorization:`Bearer ${cfg.supabaseAnonKey}`}}).then(r=>r.ok?r.json():[]).then(rows=>{if(rows.length){rows.forEach(r=>r.date=new Date(r.created_at).getFullYear());localStorage.setItem('amberflo-reviews',JSON.stringify(rows.map(r=>({...r,status:'approved'}))));renderReviews()}}).catch(()=>{});
+async function loadApprovedReviews(){
+  if(!cfg.supabaseUrl||!cfg.supabaseAnonKey)return;
+  const headers={apikey:cfg.supabaseAnonKey,Authorization:`Bearer ${cfg.supabaseAnonKey}`};
+  const withImages=`${cfg.supabaseUrl}/rest/v1/reviews?status=eq.approved&select=name,rating,content,images,created_at&order=created_at.desc&limit=6`;
+  const withoutImages=`${cfg.supabaseUrl}/rest/v1/reviews?status=eq.approved&select=name,rating,content,created_at&order=created_at.desc&limit=6`;
+  try{
+    let response=await fetch(withImages,{headers});
+    if(!response.ok)response=await fetch(withoutImages,{headers});
+    const rows=response.ok?await response.json():[];
+    if(rows.length){
+      rows.forEach(r=>r.date=new Date(r.created_at).getFullYear());
+      localStorage.setItem('amberflo-reviews',JSON.stringify(rows.map(r=>({...r,status:'approved',images:r.images||[]}))));
+      renderReviews();
+    }
+  }catch{}
+}
+loadApprovedReviews();

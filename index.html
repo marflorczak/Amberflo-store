@@ -84,13 +84,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=10">
+  <link rel="stylesheet" href="styles.css?v=11">
   <link rel="stylesheet" href="map.css">
   <link rel="stylesheet" href="gallery.css">
   <link rel="stylesheet" href="shipping.css?v=4">
   <script src="config.js?v=5" defer></script>
   <script src="products.js" defer></script>
-  <script src="app.js?v=16" defer></script>
+  <script src="app.js?v=17" defer></script>
   <script src="shipping.js?v=4" defer></script>
 </head>
 <body>
@@ -255,6 +255,16 @@
   </aside>
 
   <dialog class="modal" id="productModal"><button class="modal-close" aria-label="Zamknij">×</button><div id="productModalContent"></div></dialog>
+  <dialog class="modal review-photo-modal" id="reviewPhotoModal">
+    <button class="modal-close" aria-label="Zamknij">×</button>
+    <div class="review-photo-stage">
+      <button class="gallery-arrow prev" data-review-gallery-nav="-1" aria-label="Poprzednie zdjęcie">‹</button>
+      <img id="reviewPhotoImage" src="" alt="Zdjęcie dodane do opinii">
+      <button class="gallery-arrow next" data-review-gallery-nav="1" aria-label="Następne zdjęcie">›</button>
+      <span class="gallery-counter" id="reviewPhotoCounter">1 / 1</span>
+    </div>
+    <div class="review-photo-thumbs" id="reviewPhotoThumbs"></div>
+  </dialog>
   <dialog class="modal form-modal" id="reviewModal">
     <button class="modal-close" aria-label="Zamknij">×</button>
     <p class="eyebrow" data-i18n="yourOpinion">Twoja opinia</p><h2 data-i18n="shareExperience">Podziel się wrażeniami</h2>

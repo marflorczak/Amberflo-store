@@ -66,6 +66,8 @@ let cart = JSON.parse(localStorage.getItem('amberflo-cart') || '[]');
 let activeFilter = 'all';
 let activeGallery = [];
 let activeGalleryIndex = 0;
+let activeReviewGallery = [];
+let activeReviewGalleryIndex = 0;
 const $ = s => document.querySelector(s);
 const t = key => i18n[currentLang][key] || key;
 
@@ -119,13 +121,36 @@ function reviewImages(review){
 
 function reviewImageGrid(images){
   if(!images.length)return '';
-  return `<div class="review-photos">${images.map((src,index)=>`<a href="${escapeHtml(src)}" target="_blank" rel="noreferrer" aria-label="${currentLang==='pl'?'Otwórz zdjęcie opinii':'Open review photo'} ${index+1}"><img src="${escapeHtml(src)}" alt="${currentLang==='pl'?'Zdjęcie dodane do opinii':'Photo added to review'} ${index+1}" loading="lazy"></a>`).join('')}</div>`;
+  const gallery=encodeURIComponent(JSON.stringify(images));
+  return `<div class="review-photos">${images.map((src,index)=>`<button type="button" class="review-photo-thumb" data-review-images="${gallery}" data-review-image-index="${index}" aria-label="${currentLang==='pl'?'Otwórz zdjęcie opinii':'Open review photo'} ${index+1}"><img src="${escapeHtml(src)}" alt="${currentLang==='pl'?'Zdjęcie dodane do opinii':'Photo added to review'} ${index+1}" loading="lazy"></button>`).join('')}</div>`;
 }
 
 function renderReviews(){
   let local=JSON.parse(localStorage.getItem('amberflo-reviews')||'[]').filter(r=>r.status==='approved');
   let reviews=[...seedReviews,...local];
   $('#reviewsGrid').innerHTML=reviews.slice(0,6).map(r=>`<article class="review-card"><div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div><blockquote>${typeof r.content==='object'?r.content[currentLang]:`“${escapeHtml(r.content)}”`}</blockquote>${reviewImageGrid(reviewImages(r))}<footer><b>${escapeHtml(r.name)}</b><small>${r.date||''}</small></footer></article>`).join('');
+}
+
+function updateReviewGallery(index){
+  if(!activeReviewGallery.length)return;
+  activeReviewGalleryIndex=(index+activeReviewGallery.length)%activeReviewGallery.length;
+  const image=$('#reviewPhotoImage');
+  if(image)image.src=activeReviewGallery[activeReviewGalleryIndex];
+  const counter=$('#reviewPhotoCounter');
+  if(counter)counter.textContent=`${activeReviewGalleryIndex+1} / ${activeReviewGallery.length}`;
+  document.querySelectorAll('[data-review-gallery-nav]').forEach(button=>button.hidden=activeReviewGallery.length<2);
+  const thumbs=$('#reviewPhotoThumbs');
+  if(thumbs){
+    thumbs.hidden=activeReviewGallery.length<2;
+    thumbs.innerHTML=activeReviewGallery.map((src,i)=>`<button type="button" class="review-photo-modal-thumb ${i===activeReviewGalleryIndex?'active':''}" data-review-gallery-index="${i}" aria-label="${currentLang==='pl'?'Pokaż zdjęcie':'Show photo'} ${i+1}"><img src="${escapeHtml(src)}" alt=""></button>`).join('');
+  }
+}
+
+function openReviewGallery(images,index=0){
+  activeReviewGallery=Array.isArray(images)?images.filter(Boolean):[];
+  if(!activeReviewGallery.length)return;
+  updateReviewGallery(index);
+  $('#reviewPhotoModal').showModal();
 }
 
 function reviewFileName(file){
@@ -205,6 +230,9 @@ document.addEventListener('click',e=>{
   const detail=e.target.closest('[data-detail]');if(detail)openProduct(detail.dataset.detail);
   const galleryNav=e.target.closest('[data-gallery-nav]');if(galleryNav)updateGallery(activeGalleryIndex+Number(galleryNav.dataset.galleryNav));
   const galleryThumb=e.target.closest('[data-gallery-index]');if(galleryThumb)updateGallery(Number(galleryThumb.dataset.galleryIndex));
+  const reviewPhoto=e.target.closest('[data-review-images]');if(reviewPhoto){try{openReviewGallery(JSON.parse(decodeURIComponent(reviewPhoto.dataset.reviewImages||'[]')),Number(reviewPhoto.dataset.reviewImageIndex)||0)}catch{}}
+  const reviewGalleryNav=e.target.closest('[data-review-gallery-nav]');if(reviewGalleryNav)updateReviewGallery(activeReviewGalleryIndex+Number(reviewGalleryNav.dataset.reviewGalleryNav));
+  const reviewGalleryThumb=e.target.closest('[data-review-gallery-index]');if(reviewGalleryThumb)updateReviewGallery(Number(reviewGalleryThumb.dataset.reviewGalleryIndex));
   const qty=e.target.closest('[data-qty]');if(qty)changeQty(qty.dataset.qty,Number(qty.dataset.delta));
   const remove=e.target.closest('[data-remove]');if(remove){cart=cart.filter(x=>x.id!==remove.dataset.remove);saveCart()}
   const filter=e.target.closest('[data-filter]');if(filter){activeFilter=filter.dataset.filter;document.querySelectorAll('.filter').forEach(x=>x.classList.toggle('active',x===filter));renderProducts()}
@@ -216,7 +244,7 @@ $('#checkoutButton').onclick=()=>{toggleCart(false);$('#checkoutModal').showModa
 $('#reviewForm').onsubmit=e=>{e.preventDefault();submitReview(e.target)};$('#checkoutForm').onsubmit=e=>{e.preventDefault();submitOrder(e.target)};
 $('.copy-account').onclick=async e=>{try{await navigator.clipboard.writeText(e.currentTarget.dataset.account);toast(t('copied'))}catch{toast(e.currentTarget.dataset.account)}};
 $('.menu-toggle').onclick=e=>{const open=$('.main-nav').classList.toggle('open');e.currentTarget.setAttribute('aria-expanded',open)};document.querySelectorAll('.main-nav a').forEach(a=>a.onclick=()=>$('.main-nav').classList.remove('open'));
-document.addEventListener('keydown',e=>{if($('#productModal').open&&e.key==='ArrowLeft')updateGallery(activeGalleryIndex-1);else if($('#productModal').open&&e.key==='ArrowRight')updateGallery(activeGalleryIndex+1);else if(e.key==='Enter'&&e.target.matches('[data-detail]'))openProduct(e.target.dataset.detail)});
+document.addEventListener('keydown',e=>{if($('#reviewPhotoModal')?.open&&e.key==='ArrowLeft')updateReviewGallery(activeReviewGalleryIndex-1);else if($('#reviewPhotoModal')?.open&&e.key==='ArrowRight')updateReviewGallery(activeReviewGalleryIndex+1);else if($('#productModal').open&&e.key==='ArrowLeft')updateGallery(activeGalleryIndex-1);else if($('#productModal').open&&e.key==='ArrowRight')updateGallery(activeGalleryIndex+1);else if(e.key==='Enter'&&e.target.matches('[data-detail]'))openProduct(e.target.dataset.detail)});
 const observer=new IntersectionObserver(entries=>entries.forEach(x=>x.isIntersecting&&x.target.classList.add('visible')),{threshold:.12});document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 $('#year').textContent=new Date().getFullYear();updateI18n();loadCatalog();
 const paymentResult = new URLSearchParams(location.search).get('payment');

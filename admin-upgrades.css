@@ -12,6 +12,7 @@
 .order-details{display:grid;grid-template-columns:1fr 1fr;gap:12px 30px;padding:15px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:12px}
 .order-details p{margin:0}.order-details b{display:block}
 .order-items{margin:14px 0;padding-left:18px;font-size:12px}
+.order-item-colors{display:block;margin-top:5px;color:var(--muted);font-size:12px;line-height:1.45}
 .order-actions{display:grid;grid-template-columns:160px 1fr 1fr;gap:10px;align-items:end}
 .order-actions .cancellation-reason{grid-column:1/-1}
 .order-action-buttons{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}

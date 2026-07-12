@@ -101,8 +101,9 @@ function validPolishNip(value){
 }
 
 async function submitOrderWithShipping(form){
-  const data=Object.fromEntries(new FormData(form));const items=cart.map(item=>({id:item.id,qty:item.qty}));const status=document.querySelector('#checkoutStatus');const button=form.querySelector('button[type="submit"]');
+  const data=Object.fromEntries(new FormData(form));const items=getOrderItems();const status=document.querySelector('#checkoutStatus');const button=form.querySelector('button[type="submit"]');
   if(!items.length){status.textContent=currentLang==='pl'?'Koszyk jest pusty.':'Your cart is empty.';return}
+  const missingColor=findMissingCartColor();if(missingColor){status.textContent=t('cartColorMissing');toggleCart(true);setTimeout(()=>document.querySelector(`[data-cart-color="${missingColor.id}"][data-color-index="${missingColor.index}"]`)?.focus(),120);return}
   if(data.document_type==='invoice'&&!validPolishNip(data.tax_id)){status.textContent=currentLang==='pl'?'Sprawdź NIP — powinien zawierać 10 cyfr i mieć prawidłową sumę kontrolną.':'Check the Polish tax ID (NIP).';form.elements.tax_id?.focus();return}
   if(data.shipping_method==='inpost-paczkomat'&&!String(data.inpost_point_name||'').trim()){status.textContent=currentLang==='pl'?'Wybierz Paczkomat na mapie albo wpisz jego kod.':'Choose a parcel locker on the map or enter its code.';document.querySelector('#inpostPointName')?.focus();return}
   button.disabled=true;status.textContent=currentLang==='pl'?'Przygotowujemy zamówienie…':'Preparing your order…';

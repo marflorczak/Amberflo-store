@@ -18,8 +18,19 @@ const i18n = {
 };
 i18n.pl.workshop = 'Pracownia Amberflo';
 i18n.pl.announcement = 'Darmowa dostawa od 300 zł · Rękodzieło z Polski · Zamówienia hurtowe';
-i18n.pl.notesPlaceholder = 'np. Mix / Cytryna';
-i18n.pl.colorOrderInfo = '<p>Kolory są poglądowe. Odcień bursztynu może delikatnie różnić się od rzeczywistego koloru bursztynu na drzewku.</p><p>W polu „Uwagi / wybrany kolor bursztynu” proszę podać wybrany kolor:</p><ul><li>Mix kolor</li><li>Cytryna</li><li>Żółty</li><li>Koniak jasny/ciemny</li><li>Wiśnia</li></ul>';
+i18n.pl.notesLabel = 'Uwagi do zamówienia';
+i18n.pl.notesPlaceholder = 'np. jaśniejsza podstawa, dedykacja, termin realizacji';
+i18n.pl.amberColorLabel = 'Wybrany kolor bursztynu';
+i18n.pl.amberColorPlaceholder = 'Wybierz kolor...';
+i18n.pl.amberColorMix = 'Mix kolor';
+i18n.pl.amberColorLemon = 'Cytryna';
+i18n.pl.amberColorYellow = 'Żółty';
+i18n.pl.amberColorCognac = 'Koniak jasny/ciemny';
+i18n.pl.amberColorCherry = 'Wiśnia';
+i18n.pl.cartColorItem = 'Drzewko';
+i18n.pl.cartColorChoose = 'wybierz kolor';
+i18n.pl.cartColorMissing = 'Wybierz kolor bursztynu dla każdej sztuki w koszyku.';
+i18n.pl.colorOrderInfo = '<p>Kolory są poglądowe. Odcień bursztynu może delikatnie różnić się od rzeczywistego koloru bursztynu na drzewku.</p><p>W koszyku przy każdej sztuce wybierz kolor bursztynu:</p><ul><li>Mix kolor</li><li>Cytryna</li><li>Żółty</li><li>Koniak jasny/ciemny</li><li>Wiśnia</li></ul>';
 i18n.pl.documentLabel = 'Dokument sprzedaży';
 i18n.pl.receiptOption = 'Paragon';
 i18n.pl.receiptHint = 'Dla osoby prywatnej';
@@ -40,8 +51,19 @@ i18n.pl.reviewPhotosLabel = 'Zdjęcia do opinii';
 i18n.pl.reviewPhotosHint = 'Możesz dodać maksymalnie 4 zdjęcia: JPG, PNG, WEBP, GIF lub AVIF. Jedno zdjęcie maks. 8 MB.';
 i18n.en.workshop = 'Amberflo workshop';
 i18n.en.announcement = 'Free delivery from PLN 300 · Handmade in Poland · Wholesale orders';
-i18n.en.notesPlaceholder = 'e.g. Colour mix / Lemon';
-i18n.en.colorOrderInfo = '<p>The colours shown are for reference. The shade of amber on the tree may differ slightly from the colour presented.</p><p>Enter your selected colour in the “Notes / preferred amber colour” field:</p><ul><li>Colour mix</li><li>Lemon</li><li>Yellow</li><li>Light/dark cognac</li><li>Cherry</li></ul>';
+i18n.en.notesLabel = 'Order notes';
+i18n.en.notesPlaceholder = 'e.g. lighter base, dedication, delivery timing';
+i18n.en.amberColorLabel = 'Selected amber colour';
+i18n.en.amberColorPlaceholder = 'Choose a colour...';
+i18n.en.amberColorMix = 'Colour mix';
+i18n.en.amberColorLemon = 'Lemon';
+i18n.en.amberColorYellow = 'Yellow';
+i18n.en.amberColorCognac = 'Light/dark cognac';
+i18n.en.amberColorCherry = 'Cherry';
+i18n.en.cartColorItem = 'Tree';
+i18n.en.cartColorChoose = 'choose colour';
+i18n.en.cartColorMissing = 'Choose an amber colour for every item in your cart.';
+i18n.en.colorOrderInfo = '<p>The colours shown are for reference. The shade of amber on the tree may differ slightly from the colour presented.</p><p>In the cart, select the amber colour for each item:</p><ul><li>Colour mix</li><li>Lemon</li><li>Yellow</li><li>Light/dark cognac</li><li>Cherry</li></ul>';
 i18n.en.documentLabel = 'Sales document';
 i18n.en.receiptOption = 'Receipt';
 i18n.en.receiptHint = 'For individual customers';
@@ -60,6 +82,14 @@ i18n.en.closedSunday = 'Sunday: closed';
 i18n.en.sellerDetails = 'Seller details';
 i18n.en.reviewPhotosLabel = 'Review photos';
 i18n.en.reviewPhotosHint = 'You can add up to 4 photos: JPG, PNG, WEBP, GIF or AVIF. One photo max. 8 MB.';
+
+const amberColorOptions = [
+  {value:'Mix kolor',pl:'Mix kolor',en:'Colour mix'},
+  {value:'Cytryna',pl:'Cytryna',en:'Lemon'},
+  {value:'Żółty',pl:'Żółty',en:'Yellow'},
+  {value:'Koniak jasny/ciemny',pl:'Koniak jasny/ciemny',en:'Light/dark cognac'},
+  {value:'Wiśnia',pl:'Wiśnia',en:'Cherry'}
+];
 
 let currentLang = localStorage.getItem('amberflo-lang') || 'pl';
 let cart = JSON.parse(localStorage.getItem('amberflo-cart') || '[]');
@@ -89,10 +119,18 @@ function renderSwatches(){ $('#swatches').innerHTML=colors.map(c=>`<div class="s
 function renderProducts(){ const visible=products.filter(p=>activeFilter==='all'||p.category===activeFilter); $('#productGrid').innerHTML=visible.map(p=>`<article class="product-card"><div class="product-image" data-detail="${p.id}" role="button" tabindex="0"><span class="product-badge">${p.badge[currentLang]}</span><img src="${p.image}" alt="${p.name[currentLang]}" loading="lazy"></div><div class="product-info"><div class="product-meta"><span>${p.height}</span><span>${p.pieces} ${currentLang==='pl'?'bryłek':'stones'}</span></div><h3>${p.name[currentLang]}</h3><p class="product-description">${p.desc[currentLang]}</p><div class="product-bottom"><strong class="price">${money(p.price)}</strong><button class="add-cart" data-add="${p.id}" aria-label="${t('addToCart')}">+</button></div></div></article>`).join(''); }
 function updateI18n(){ document.documentElement.lang=currentLang; document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.dataset.i18n;if(i18n[currentLang][key])el.innerHTML=i18n[currentLang][key]}); document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const key=el.dataset.i18nPlaceholder;if(i18n[currentLang][key])el.placeholder=i18n[currentLang][key]}); document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLang)); renderSwatches();renderProducts();renderReviews();renderCart(); }
 function escapeHtml(s=''){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
-function addToCart(id){ const found=cart.find(x=>x.id===id);found?found.qty++:cart.push({id,qty:1});saveCart();toast(t('added')); }
-function saveCart(){localStorage.setItem('amberflo-cart',JSON.stringify(cart));renderCart();}
-function renderCart(){const count=cart.reduce((s,x)=>s+x.qty,0);$('#cartCount').textContent=count;const list=$('#cartItems'),empty=$('#cartEmpty'),summary=$('#cartSummary');if(!count){list.innerHTML='';empty.style.display='block';summary.style.display='none';return}empty.style.display='none';summary.style.display='block';list.innerHTML=cart.map(item=>{const p=products.find(x=>x.id===item.id);return`<div class="cart-item"><img src="${p.image}" alt="${p.name[currentLang]}"><div><h4>${p.name[currentLang]}</h4><small>${money(p.price)}</small><div class="qty-control"><button data-qty="${p.id}" data-delta="-1">−</button><span>${item.qty}</span><button data-qty="${p.id}" data-delta="1">+</button></div></div><button class="remove-item" data-remove="${p.id}" aria-label="Usuń">×</button></div>`}).join('');$('#cartTotal').textContent=money(cart.reduce((s,item)=>s+products.find(p=>p.id===item.id).price*item.qty,0));}
-function changeQty(id,delta){const item=cart.find(x=>x.id===id);if(!item)return;item.qty+=delta;if(item.qty<=0)cart=cart.filter(x=>x.id!==id);saveCart();}
+function syncCartItem(item){const qty=Math.max(1,Math.min(20,Number(item.qty)||1));const source=Array.isArray(item.colors)?item.colors:[];const colors=Array.from({length:qty},(_,index)=>String(source[index]||''));return {...item,qty,colors};}
+function normalizeCart(){cart=(Array.isArray(cart)?cart:[]).filter(item=>item&&item.id).map(syncCartItem);}
+function cartColorOptionsHtml(selected=''){return `<option value="">${t('amberColorPlaceholder')}</option>${amberColorOptions.map(option=>`<option value="${escapeHtml(option.value)}" ${option.value===selected?'selected':''}>${escapeHtml(currentLang==='pl'?option.pl:option.en)}</option>`).join('')}`;}
+function cartColorRows(item){return item.colors.map((value,index)=>`<label class="cart-color-choice"><span>${t('cartColorItem')} ${index+1}: ${t('cartColorChoose')}</span><select data-cart-color="${escapeHtml(item.id)}" data-color-index="${index}" required>${cartColorOptionsHtml(value)}</select></label>`).join('');}
+function addToCart(id){const found=cart.find(x=>x.id===id);if(found){const synced=syncCartItem(found);Object.assign(found,synced,{qty:synced.qty+1,colors:[...synced.colors,'']});}else cart.push({id,qty:1,colors:['']});saveCart();toast(t('added'));}
+function saveCart(){normalizeCart();localStorage.setItem('amberflo-cart',JSON.stringify(cart));renderCart();}
+function renderCart(){normalizeCart();const count=cart.reduce((s,x)=>s+x.qty,0);$('#cartCount').textContent=count;const list=$('#cartItems'),empty=$('#cartEmpty'),summary=$('#cartSummary');if(!count){list.innerHTML='';empty.style.display='block';summary.style.display='none';return}empty.style.display='none';summary.style.display='block';list.innerHTML=cart.map(item=>{const p=products.find(x=>x.id===item.id);if(!p)return'';return`<div class="cart-item"><img src="${p.image}" alt="${p.name[currentLang]}"><div class="cart-item-main"><h4>${p.name[currentLang]}</h4><small>${money(p.price)}</small><div class="qty-control"><button data-qty="${p.id}" data-delta="-1">−</button><span>${item.qty}</span><button data-qty="${p.id}" data-delta="1">+</button></div><div class="cart-color-list">${cartColorRows(item)}</div></div><button class="remove-item" data-remove="${p.id}" aria-label="Usuń">×</button></div>`}).join('');$('#cartTotal').textContent=money(cart.reduce((s,item)=>{const p=products.find(product=>product.id===item.id);return s+(p?p.price*item.qty:0)},0));}
+function changeQty(id,delta){const item=cart.find(x=>x.id===id);if(!item)return;const synced=syncCartItem(item);const qty=synced.qty+delta;if(qty<=0)cart=cart.filter(x=>x.id!==id);else{synced.qty=qty;if(delta>0)synced.colors.push('');else synced.colors=synced.colors.slice(0,qty);Object.assign(item,synced)}saveCart();}
+function setCartColor(id,index,value){const item=cart.find(x=>x.id===id);if(!item)return;Object.assign(item,syncCartItem(item));item.colors[Number(index)]=String(value||'');saveCart();}
+function getOrderItems(){normalizeCart();return cart.map(item=>({id:item.id,qty:item.qty,colors:item.colors.slice(0,item.qty)}));}
+function findMissingCartColor(){normalizeCart();for(const item of cart){const missing=item.colors.findIndex(value=>!String(value||'').trim());if(missing>-1)return{id:item.id,index:missing}}return null;}
+function cartOrderLines(){return getOrderItems().map(item=>{const p=products.find(product=>product.id===item.id);const colors=item.colors.map((color,index)=>`${t('cartColorItem')} ${index+1}: ${color}`).join(', ');return`${p?.name?.pl||item.id} × ${item.qty} — ${money((p?.price||0)*item.qty)}\nKolory: ${colors}`}).join('\n');}
 function toggleCart(open){$('#cartDrawer').classList.toggle('open',open);$('#drawerOverlay').classList.toggle('open',open);$('#cartDrawer').setAttribute('aria-hidden',!open);document.body.classList.toggle('no-scroll',open);}
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>el.classList.remove('show'),2600);}
 function updateGallery(index){
@@ -105,8 +143,8 @@ function updateGallery(index){
   document.querySelectorAll('[data-gallery-index]').forEach((button,i)=>button.classList.toggle('active',i===activeGalleryIndex));
 }
 function openProduct(id){const p=products.find(x=>x.id===id);activeGallery=p.gallery?.length?p.gallery:[p.image];activeGalleryIndex=0;const arrows=activeGallery.length>1?`<button class="gallery-arrow prev" data-gallery-nav="-1" aria-label="${currentLang==='pl'?'Poprzednie zdjęcie':'Previous image'}">‹</button><button class="gallery-arrow next" data-gallery-nav="1" aria-label="${currentLang==='pl'?'Następne zdjęcie':'Next image'}">›</button>`:'';const thumbs=activeGallery.length>1?`<div class="gallery-thumbs">${activeGallery.map((src,i)=>`<button class="gallery-thumb ${i===0?'active':''}" data-gallery-index="${i}" aria-label="${currentLang==='pl'?'Pokaż zdjęcie':'Show image'} ${i+1}"><img src="${src}" alt=""></button>`).join('')}</div>`:'';$('#productModalContent').innerHTML=`<div class="product-modal-grid"><div class="product-gallery"><div class="gallery-stage"><img id="modalGalleryImage" src="${activeGallery[0]}" alt="${p.name[currentLang]}">${arrows}<span class="gallery-counter" id="galleryCounter">1 / ${activeGallery.length}</span></div>${thumbs}</div><div class="product-modal-copy"><p class="eyebrow">Amberflo · ${p.badge[currentLang]}</p><h2>${p.name[currentLang]}</h2><p>${p.desc[currentLang]} ${currentLang==='pl'?'Każdy egzemplarz jest wykonywany ręcznie, dlatego podstawa i układ gałązek mogą delikatnie różnić się od zdjęcia.':'Each piece is handmade, so the base and arrangement of branches may vary slightly from the photo.'}</p><div class="specs"><div><span>${t('height')}</span><b>${p.height}</b></div><div><span>${t('pieces')}</span><b>${p.pieces}</b></div><div><span>${t('width')}</span><b>${p.width}</b></div><div><span>${t('material')}</span><b>${t('materialValue')}</b></div></div><p class="gallery-note">${currentLang==='pl'?'Zdjęcia przedstawiają dostępne, ręcznie wykonane warianty. Naturalna podstawa i układ bursztynu są unikatowe.':'Photos show available handmade variants. The natural base and amber arrangement are unique.'}</p><p class="modal-price">${money(p.price)}</p><button class="button button-primary full" data-modal-add="${p.id}">${t('addToCart')}</button></div></div>`;$('#productModal').showModal();}
-async function submitOrder(form){const data=Object.fromEntries(new FormData(form));const items=cart.map(x=>({id:x.id,qty:x.qty}));const status=$('#checkoutStatus');status.textContent='…';if(data.payment==='online'){if(!cfg.supabaseUrl||!cfg.supabaseAnonKey){status.textContent=t('configNeeded');return}try{const res=await fetch(`${cfg.supabaseUrl}/functions/v1/create-checkout`,{method:'POST',headers:{Authorization:`Bearer ${cfg.supabaseAnonKey}`,'Content-Type':'application/json'},body:JSON.stringify({customer:data,items,language:currentLang})});const out=await res.json();if(!res.ok||!out.url)throw new Error(out.error||'Checkout');window.location.href=out.url;}catch(e){status.textContent=currentLang==='pl'?'Nie udało się uruchomić płatności. Spróbuj ponownie.':'Could not start payment. Please try again.';}return}
-  const lines=cart.map(x=>{const p=products.find(z=>z.id===x.id);return`${p.name.pl} × ${x.qty} — ${money(p.price*x.qty)}`}).join('\n');const total=money(cart.reduce((s,x)=>s+products.find(p=>p.id===x.id).price*x.qty,0));const body=`NOWE ZAMÓWIENIE AMBERFLO\n\nKlient: ${data.name}\nTelefon: ${data.phone}\nE-mail: ${data.email}\nAdres: ${data.address}\nUwagi: ${data.notes||'-'}\n\n${lines}\n\nSuma: ${total}\nPłatność: przelew tradycyjny`;if(cfg.supabaseUrl&&cfg.supabaseAnonKey){try{await fetch(`${cfg.supabaseUrl}/functions/v1/notify`,{method:'POST',headers:{Authorization:`Bearer ${cfg.supabaseAnonKey}`,'Content-Type':'application/json'},body:JSON.stringify({type:'order',payload:{...data,items,summary:lines,total}})});status.textContent=t('orderSaved');cart=[];saveCart();return}catch(e){}}
+async function submitOrder(form){const data=Object.fromEntries(new FormData(form));const items=getOrderItems();const status=$('#checkoutStatus');status.textContent='…';const missingColor=findMissingCartColor();if(missingColor){status.textContent=t('cartColorMissing');toggleCart(true);setTimeout(()=>document.querySelector(`[data-cart-color="${missingColor.id}"][data-color-index="${missingColor.index}"]`)?.focus(),120);return}if(data.payment==='online'){if(!cfg.supabaseUrl||!cfg.supabaseAnonKey){status.textContent=t('configNeeded');return}try{const res=await fetch(`${cfg.supabaseUrl}/functions/v1/create-checkout`,{method:'POST',headers:{Authorization:`Bearer ${cfg.supabaseAnonKey}`,'Content-Type':'application/json'},body:JSON.stringify({customer:data,items,language:currentLang})});const out=await res.json();if(!res.ok||!out.url)throw new Error(out.error||'Checkout');window.location.href=out.url;}catch(e){status.textContent=currentLang==='pl'?'Nie udało się uruchomić płatności. Spróbuj ponownie.':'Could not start payment. Please try again.';}return}
+  const lines=cartOrderLines();const total=money(cart.reduce((s,x)=>{const p=products.find(product=>product.id===x.id);return s+(p?p.price*x.qty:0)},0));const body=`NOWE ZAMÓWIENIE AMBERFLO\n\nKlient: ${data.name}\nTelefon: ${data.phone}\nE-mail: ${data.email}\nAdres: ${data.address}\nUwagi: ${data.notes||'-'}\n\n${lines}\n\nSuma: ${total}\nPłatność: przelew tradycyjny`;if(cfg.supabaseUrl&&cfg.supabaseAnonKey){try{await fetch(`${cfg.supabaseUrl}/functions/v1/notify`,{method:'POST',headers:{Authorization:`Bearer ${cfg.supabaseAnonKey}`,'Content-Type':'application/json'},body:JSON.stringify({type:'order',payload:{...data,items,summary:lines,total}})});status.textContent=t('orderSaved');cart=[];saveCart();return}catch(e){}}
   status.textContent=t('emailOrder');window.location.href=`mailto:biuroamberflo@gmail.com?subject=${encodeURIComponent('Nowe zamówienie Amberflo')}&body=${encodeURIComponent(body)}`;
 }
 
@@ -239,8 +277,9 @@ document.addEventListener('click',e=>{
   const lang=e.target.closest('[data-lang]');if(lang){currentLang=lang.dataset.lang;localStorage.setItem('amberflo-lang',currentLang);updateI18n()}
   const close=e.target.closest('.modal-close');if(close)close.closest('dialog').close();
 });
+document.addEventListener('change',e=>{const color=e.target.closest('[data-cart-color]');if(color)setCartColor(color.dataset.cartColor,Number(color.dataset.colorIndex),color.value)});
 $('#cartButton').onclick=()=>toggleCart(true);$('#closeCart').onclick=()=>toggleCart(false);$('#drawerOverlay').onclick=()=>toggleCart(false);
-$('#checkoutButton').onclick=()=>{toggleCart(false);$('#checkoutModal').showModal()};$('#openReview').onclick=()=>$('#reviewModal').showModal();
+$('#checkoutButton').onclick=()=>{const missingColor=findMissingCartColor();if(missingColor){toast(t('cartColorMissing'));document.querySelector(`[data-cart-color="${missingColor.id}"][data-color-index="${missingColor.index}"]`)?.focus();return}toggleCart(false);$('#checkoutModal').showModal()};$('#openReview').onclick=()=>$('#reviewModal').showModal();
 $('#reviewForm').onsubmit=e=>{e.preventDefault();submitReview(e.target)};$('#checkoutForm').onsubmit=e=>{e.preventDefault();submitOrder(e.target)};
 $('.copy-account').onclick=async e=>{try{await navigator.clipboard.writeText(e.currentTarget.dataset.account);toast(t('copied'))}catch{toast(e.currentTarget.dataset.account)}};
 $('.menu-toggle').onclick=e=>{const open=$('.main-nav').classList.toggle('open');e.currentTarget.setAttribute('aria-expanded',open)};document.querySelectorAll('.main-nav a').forEach(a=>a.onclick=()=>$('.main-nav').classList.remove('open'));

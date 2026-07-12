@@ -60,3 +60,4 @@ footer>div img{width:130px;height:82px;object-fit:cover;object-position:center;f
 .contact-hours span,.contact-business span{font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:#c7d1c0}
 .contact-hours small,.contact-business small{color:#d3dacb;font-size:12px}
 .footer-company-details{margin-top:10px!important;color:#b8aa9b;line-height:1.5}
+.cart-item-main{min-width:0}.cart-color-list{margin-top:12px;display:grid;gap:8px}.cart-color-choice{display:flex;flex-direction:column;gap:5px}.cart-color-choice span{font-size:9px;text-transform:uppercase;letter-spacing:.09em;font-weight:700;color:var(--cognac)}.cart-color-choice select{width:100%;border:1px solid var(--line);background:#fffaf3;padding:9px 10px;outline:none;color:var(--ink);font-size:12px}.cart-color-choice select:focus{border-color:var(--amber)}

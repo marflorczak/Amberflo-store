@@ -13,6 +13,12 @@ const validNip = (nip: string) => {
   const checksum = weights.reduce((sum, weight, index) => sum + weight * Number(nip[index]), 0) % 11;
   return checksum < 10 && checksum === Number(nip[9]);
 };
+const allowedAmberColors = new Set(["Mix kolor", "Cytryna", "Żółty", "Koniak jasny/ciemny", "Wiśnia"]);
+const normalizeItemColors = (item: { colors?: unknown[] }, quantity: number) => {
+  const colors = Array.isArray(item.colors) ? item.colors.map(color => String(color || "").trim()).slice(0, quantity) : [];
+  if (colors.length !== quantity || colors.some(color => !allowedAmberColors.has(color))) throw new Error("Wybierz kolor bursztynu dla każdej sztuki w koszyku");
+  return colors;
+};
 
 serve(async req => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
@@ -29,10 +35,11 @@ serve(async req => {
     const { data: products, error: productsError } = await supabase.from("products").select("id,name_pl,name_en,price,active").in("id", ids).eq("active", true);
     if (productsError) throw productsError;
     const productMap = new Map((products || []).map(product => [product.id, product]));
-    const normalized = items.map((item: { id: string; qty: number }) => {
+    const normalized = items.map((item: { id: string; qty: number; colors?: unknown[] }) => {
       const product = productMap.get(String(item.id));
       if (!product) throw new Error("Produkt jest niedostępny");
-      return { id: product.id, name: language === "en" ? (product.name_en || product.name_pl) : product.name_pl, quantity: Math.max(1, Math.min(20, Number(item.qty) || 1)), price: Math.round(Number(product.price) * 100) };
+      const quantity = Math.max(1, Math.min(20, Number(item.qty) || 1));
+      return { id: product.id, name: language === "en" ? (product.name_en || product.name_pl) : product.name_pl, quantity, colors: normalizeItemColors(item, quantity), price: Math.round(Number(product.price) * 100) };
     });
 
     const { data: shipping, error: shippingError } = await supabase.from("shipping_methods").select("id,name_pl,name_en,price_cents,active").eq("id", String(shippingMethodId)).eq("active", true).single();
@@ -45,7 +52,7 @@ serve(async req => {
     const siteUrl = (Deno.env.get("SITE_URL") || req.headers.get("origin") || "http://localhost:8000").replace(/\/+$/, "");
     const productsTotal = normalized.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const shippingCost = productsTotal >= 30000 ? 0 : shipping.price_cents;
-    const lineItems = normalized.map(item => ({ quantity: item.quantity, price_data: { currency: "pln", unit_amount: item.price, product_data: { name: item.name } } }));
+    const lineItems = normalized.map(item => ({ quantity: item.quantity, price_data: { currency: "pln", unit_amount: item.price, product_data: { name: item.name, description: item.colors.map((color, index) => `Sztuka ${index + 1}: ${color}`).join(", ") } } }));
     if (shippingCost > 0) lineItems.push({ quantity: 1, price_data: { currency: "pln", unit_amount: shippingCost, product_data: { name: `${language === "en" ? "Shipping" : "Dostawa"}: ${shippingName}` } } });
 
     const session = await stripe.checkout.sessions.create({

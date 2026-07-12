@@ -36,7 +36,10 @@ serve(async req => {
     const cancellationSubject = `Prośba o anulowanie zamówienia Amberflo #${orderShort}`;
     const cancellationUrl = `mailto:biuroamberflo@gmail.com?subject=${encodeURIComponent(cancellationSubject)}&body=${encodeURIComponent(`Proszę o anulowanie zamówienia #${orderShort}.\n\nImię i nazwisko: ${customer.name || ""}\nE-mail użyty w zamówieniu: ${customer.email || ""}`)}`;
     const cancellationBlock = `<hr style="margin:28px 0;border:0;border-top:1px solid #ead8c4"><p><b>Chcesz anulować zamówienie?</b><br>Wyślij prośbę możliwie szybko. Jeżeli zamówienie zostało już wysłane, anulowanie może nie być możliwe.</p><p><a href="${esc(cancellationUrl)}" style="display:inline-block;padding:12px 18px;background:#241914;color:#fff;text-decoration:none">Poproś o anulowanie zamówienia</a></p>`;
-    const products = (order.items || []).map((item: { name: string; quantity: number; price: number }) => `<li>${esc(item.name)} × ${item.quantity} — ${(item.price * item.quantity / 100).toFixed(2)} zł</li>`).join("");
+    const products = (order.items || []).map((item: { name: string; quantity: number; price: number; colors?: string[] }) => {
+      const colors = Array.isArray(item.colors) ? `<br><small>${item.colors.map((color, index) => `Sztuka ${index + 1}: ${esc(color)}`).join("<br>")}</small>` : "";
+      return `<li>${esc(item.name)} × ${item.quantity} — ${(item.price * item.quantity / 100).toFixed(2)} zł${colors}</li>`;
+    }).join("");
     const shipping = order.shipping_method || {};
     const point = customer.inpost_point_name ? `<p><b>Paczkomat:</b> ${esc(customer.inpost_point_name)}<br>${esc(customer.inpost_point_address)}</p>` : "";
     const document = customer.document_type === "invoice" ? `<p><b>Dokument:</b> Faktura VAT<br><b>Nabywca:</b> ${esc(customer.invoice_name)}<br><b>NIP:</b> ${esc(customer.tax_id)}<br><b>Adres do faktury:</b><br>${esc(customer.invoice_address).replace(/\n/g, "<br>")}</p>` : `<p><b>Dokument:</b> Paragon</p>`;

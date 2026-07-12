@@ -13,6 +13,12 @@ const validNip = (nip: string) => {
   const checksum = weights.reduce((sum, weight, index) => sum + weight * Number(nip[index]), 0) % 11;
   return checksum < 10 && checksum === Number(nip[9]);
 };
+const allowedAmberColors = new Set(["Mix kolor", "Cytryna", "Żółty", "Koniak jasny/ciemny", "Wiśnia"]);
+const normalizeItemColors = (item: { colors?: unknown[] }, quantity: number) => {
+  const colors = Array.isArray(item.colors) ? item.colors.map(color => String(color || "").trim()).slice(0, quantity) : [];
+  if (colors.length !== quantity || colors.some(color => !allowedAmberColors.has(color))) throw new Error("Wybierz kolor bursztynu dla każdej sztuki w koszyku");
+  return colors;
+};
 
 serve(async req => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
@@ -28,9 +34,10 @@ serve(async req => {
     const { data: products, error: productsError } = await supabase.from("products").select("id,name_pl,name_en,price,active").in("id", ids).eq("active", true);
     if (productsError) throw productsError;
     const productMap = new Map((products || []).map(product => [product.id, product]));
-    const normalized = items.map((item: { id: string; qty: number }) => {
+    const normalized = items.map((item: { id: string; qty: number; colors?: unknown[] }) => {
       const product = productMap.get(String(item.id));if (!product) throw new Error("Produkt jest niedostępny");
-      return { id: product.id, name: language === "en" ? (product.name_en || product.name_pl) : product.name_pl, quantity: Math.max(1, Math.min(20, Number(item.qty) || 1)), price: Math.round(Number(product.price) * 100) };
+      const quantity = Math.max(1, Math.min(20, Number(item.qty) || 1));
+      return { id: product.id, name: language === "en" ? (product.name_en || product.name_pl) : product.name_pl, quantity, colors: normalizeItemColors(item, quantity), price: Math.round(Number(product.price) * 100) };
     });
     const { data: shipping, error: shippingError } = await supabase.from("shipping_methods").select("id,name_pl,name_en,price_cents,active").eq("id", String(shippingMethodId)).eq("active", true).single();
     if (shippingError || !shipping) throw new Error("Wybrana metoda dostawy jest niedostępna");
@@ -48,7 +55,7 @@ serve(async req => {
       const ownerEmail = Deno.env.get("OWNER_EMAIL") || "biuroamberflo@gmail.com";
       const fromEmail = Deno.env.get("FROM_EMAIL") || "Amberflo <onboarding@resend.dev>";
       const sendCustomerEmails = Deno.env.get("SEND_CUSTOMER_EMAILS") === "true";
-      const productsHtml = normalized.map(item => `<li>${esc(item.name)} × ${item.quantity} — ${(item.price * item.quantity / 100).toFixed(2)} zł</li>`).join("");
+      const productsHtml = normalized.map(item => `<li>${esc(item.name)} × ${item.quantity} — ${(item.price * item.quantity / 100).toFixed(2)} zł<br><small>${item.colors.map((color, index) => `Sztuka ${index + 1}: ${esc(color)}`).join("<br>")}</small></li>`).join("");
       const pointHtml = safeCustomer.inpost_point_name ? `<p><b>Paczkomat:</b> ${esc(safeCustomer.inpost_point_name)}<br>${esc(safeCustomer.inpost_point_address)}</p>` : "";
       const documentHtml = safeCustomer.document_type === "invoice" ? `<p><b>Dokument:</b> Faktura VAT<br><b>Nabywca:</b> ${esc(safeCustomer.invoice_name)}<br><b>NIP:</b> ${esc(safeCustomer.tax_id)}<br><b>Adres do faktury:</b><br>${esc(safeCustomer.invoice_address).replace(/\n/g, "<br>")}</p>` : `<p><b>Dokument:</b> Paragon</p>`;
       const orderShort = String(order.id).slice(0, 8).toUpperCase();

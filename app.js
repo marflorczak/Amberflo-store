@@ -4,7 +4,7 @@ const money = value => new Intl.NumberFormat(currentLang === 'pl' ? 'pl-PL' : 'e
 let products = window.AMBERFLO_PRODUCTS || [];
 
 const colors = [
-  ['rgba(236,201,53,.72)','Cytrynowy','Lemon'],['#f5d95f','Żółty','Yellow'],['#984713','Koniakowy','Cognac'],['linear-gradient(145deg,#520611 0%,#340006 48%,#140002 100%)','Wiśniowy','Cherry']
+  ['rgba(236,201,53,.72)','Cytrynowy','Lemon'],['#984713','Koniakowy','Cognac'],['linear-gradient(145deg,#520611 0%,#340006 48%,#140002 100%)','Wiśniowy','Cherry']
 ];
 const seedReviews = [
   {name:'Allegro · 216 kamieni',rating:5,content:{pl:'Średnia 5,00/5 na podstawie 18 ocen i 6 recenzji produktu.',en:'Average 5.00/5 based on 18 ratings and 6 product reviews.'},date:'dane Allegro'},
@@ -24,13 +24,12 @@ i18n.pl.amberColorLabel = 'Wybrany kolor bursztynu';
 i18n.pl.amberColorPlaceholder = 'Wybierz kolor...';
 i18n.pl.amberColorMix = 'Mix kolor';
 i18n.pl.amberColorLemon = 'Cytryna';
-i18n.pl.amberColorYellow = 'Żółty';
 i18n.pl.amberColorCognac = 'Koniak jasny/ciemny';
 i18n.pl.amberColorCherry = 'Wiśnia';
 i18n.pl.cartColorItem = 'Drzewko';
 i18n.pl.cartColorChoose = 'wybierz kolor';
 i18n.pl.cartColorMissing = 'Wybierz kolor bursztynu dla każdej sztuki w koszyku.';
-i18n.pl.colorOrderInfo = '<p>Kolory są poglądowe. Odcień bursztynu może delikatnie różnić się od rzeczywistego koloru bursztynu na drzewku.</p><p>W koszyku przy każdej sztuce wybierz kolor bursztynu:</p><ul><li>Mix kolor</li><li>Cytryna</li><li>Żółty</li><li>Koniak jasny/ciemny</li><li>Wiśnia</li></ul>';
+i18n.pl.colorOrderInfo = '<p>Kolory są poglądowe. Odcień bursztynu może delikatnie różnić się od rzeczywistego koloru bursztynu na drzewku.</p><p>W koszyku przy każdej sztuce wybierz kolor bursztynu:</p><ul><li>Mix kolor</li><li>Cytryna</li><li>Koniak jasny/ciemny</li><li>Wiśnia</li></ul>';
 i18n.pl.documentLabel = 'Dokument sprzedaży';
 i18n.pl.receiptOption = 'Paragon';
 i18n.pl.receiptHint = 'Dla osoby prywatnej';
@@ -57,13 +56,12 @@ i18n.en.amberColorLabel = 'Selected amber colour';
 i18n.en.amberColorPlaceholder = 'Choose a colour...';
 i18n.en.amberColorMix = 'Colour mix';
 i18n.en.amberColorLemon = 'Lemon';
-i18n.en.amberColorYellow = 'Yellow';
 i18n.en.amberColorCognac = 'Light/dark cognac';
 i18n.en.amberColorCherry = 'Cherry';
 i18n.en.cartColorItem = 'Tree';
 i18n.en.cartColorChoose = 'choose colour';
 i18n.en.cartColorMissing = 'Choose an amber colour for every item in your cart.';
-i18n.en.colorOrderInfo = '<p>The colours shown are for reference. The shade of amber on the tree may differ slightly from the colour presented.</p><p>In the cart, select the amber colour for each item:</p><ul><li>Colour mix</li><li>Lemon</li><li>Yellow</li><li>Light/dark cognac</li><li>Cherry</li></ul>';
+i18n.en.colorOrderInfo = '<p>The colours shown are for reference. The shade of amber on the tree may differ slightly from the colour presented.</p><p>In the cart, select the amber colour for each item:</p><ul><li>Colour mix</li><li>Lemon</li><li>Light/dark cognac</li><li>Cherry</li></ul>';
 i18n.en.documentLabel = 'Sales document';
 i18n.en.receiptOption = 'Receipt';
 i18n.en.receiptHint = 'For individual customers';
@@ -86,7 +84,6 @@ i18n.en.reviewPhotosHint = 'You can add up to 4 photos: JPG, PNG, WEBP, GIF or A
 const amberColorOptions = [
   {value:'Mix kolor',pl:'Mix kolor',en:'Colour mix'},
   {value:'Cytryna',pl:'Cytryna',en:'Lemon'},
-  {value:'Żółty',pl:'Żółty',en:'Yellow'},
   {value:'Koniak jasny/ciemny',pl:'Koniak jasny/ciemny',en:'Light/dark cognac'},
   {value:'Wiśnia',pl:'Wiśnia',en:'Cherry'}
 ];
@@ -119,7 +116,7 @@ function renderSwatches(){ $('#swatches').innerHTML=colors.map(c=>`<div class="s
 function renderProducts(){ const visible=products.filter(p=>activeFilter==='all'||p.category===activeFilter); $('#productGrid').innerHTML=visible.map(p=>`<article class="product-card"><div class="product-image" data-detail="${p.id}" role="button" tabindex="0"><span class="product-badge">${p.badge[currentLang]}</span><img src="${p.image}" alt="${p.name[currentLang]}" loading="lazy"></div><div class="product-info"><div class="product-meta"><span>${p.height}</span><span>${p.pieces} ${currentLang==='pl'?'bryłek':'stones'}</span></div><h3>${p.name[currentLang]}</h3><p class="product-description">${p.desc[currentLang]}</p><div class="product-bottom"><strong class="price">${money(p.price)}</strong><button class="add-cart" data-add="${p.id}" aria-label="${t('addToCart')}">+</button></div></div></article>`).join(''); }
 function updateI18n(){ document.documentElement.lang=currentLang; document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.dataset.i18n;if(i18n[currentLang][key])el.innerHTML=i18n[currentLang][key]}); document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const key=el.dataset.i18nPlaceholder;if(i18n[currentLang][key])el.placeholder=i18n[currentLang][key]}); document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLang)); renderSwatches();renderProducts();renderReviews();renderCart(); }
 function escapeHtml(s=''){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
-function syncCartItem(item){const qty=Math.max(1,Math.min(20,Number(item.qty)||1));const source=Array.isArray(item.colors)?item.colors:[];const colors=Array.from({length:qty},(_,index)=>String(source[index]||''));return {...item,qty,colors};}
+function syncCartItem(item){const qty=Math.max(1,Math.min(20,Number(item.qty)||1));const source=Array.isArray(item.colors)?item.colors:[];const allowedColors=new Set(amberColorOptions.map(option=>option.value));const colors=Array.from({length:qty},(_,index)=>{const value=String(source[index]||'');return allowedColors.has(value)?value:''});return {...item,qty,colors};}
 function normalizeCart(){cart=(Array.isArray(cart)?cart:[]).filter(item=>item&&item.id).map(syncCartItem);}
 function cartColorOptionsHtml(selected=''){return `<option value="">${t('amberColorPlaceholder')}</option>${amberColorOptions.map(option=>`<option value="${escapeHtml(option.value)}" ${option.value===selected?'selected':''}>${escapeHtml(currentLang==='pl'?option.pl:option.en)}</option>`).join('')}`;}
 function cartColorRows(item){return item.colors.map((value,index)=>`<label class="cart-color-choice"><span>${t('cartColorItem')} ${index+1}: ${t('cartColorChoose')}</span><select data-cart-color="${escapeHtml(item.id)}" data-color-index="${index}" required>${cartColorOptionsHtml(value)}</select></label>`).join('');}

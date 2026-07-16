@@ -13,7 +13,7 @@ const validNip = (nip: string) => {
   const checksum = weights.reduce((sum, weight, index) => sum + weight * Number(nip[index]), 0) % 11;
   return checksum < 10 && checksum === Number(nip[9]);
 };
-const allowedAmberColors = new Set(["Mix kolor", "Cytryna", "Żółty", "Koniak jasny/ciemny", "Wiśnia"]);
+const allowedAmberColors = new Set(["Mix kolor", "Cytryna", "Koniak jasny/ciemny", "Wiśnia"]);
 const normalizeItemColors = (item: { colors?: unknown[] }, quantity: number) => {
   const colors = Array.isArray(item.colors) ? item.colors.map(color => String(color || "").trim()).slice(0, quantity) : [];
   if (colors.length !== quantity || colors.some(color => !allowedAmberColors.has(color))) throw new Error("Wybierz kolor bursztynu dla każdej sztuki w koszyku");

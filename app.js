@@ -62,6 +62,7 @@ i18n.pl.faqQ4 = 'Czy wystawiana jest faktura?';
 i18n.pl.faqA4 = 'Tak. Podczas składania zamówienia możesz wybrać paragon albo fakturę VAT. Po wybraniu faktury pojawią się pola na dane nabywcy i NIP.';
 i18n.pl.faqQ5 = 'Jak działa zwrot?';
 i18n.pl.faqA5 = 'W przypadku standardowego produktu poinformuj nas o odstąpieniu w ciągu 14 dni od jego otrzymania, a następnie odeślij odpowiednio zabezpieczony produkt. Produkty wykonane według indywidualnej specyfikacji mogą nie podlegać zwrotowi. Szczegóły znajdziesz w dokumencie <a href="dostawa-i-zwroty.html">Dostawa i zwroty</a>.';
+i18n.pl.allegroButton = 'Zobacz sklep na Allegro';
 i18n.en.workshop = 'Amberflo workshop';
 i18n.en.announcement = 'Free delivery from PLN 300 · Handmade in Poland · Wholesale orders';
 i18n.en.notesLabel = 'Order notes';
@@ -108,6 +109,7 @@ i18n.en.faqQ4 = 'Can I receive a VAT invoice?';
 i18n.en.faqA4 = 'Yes. During checkout, you can choose a receipt or VAT invoice. When you select an invoice, fields for the buyer details and tax ID will appear.';
 i18n.en.faqQ5 = 'How do returns work?';
 i18n.en.faqA5 = 'For a standard product, notify us of your withdrawal within 14 days of receiving it and then return the properly secured product. Products made to an individual specification may be excluded from returns. See <a href="dostawa-i-zwroty.html">Delivery and returns</a> for details.';
+i18n.en.allegroButton = 'View our Allegro store';
 
 const amberColorOptions = [
   {value:'Mix kolor',pl:'Mix kolor',en:'Colour mix'},

@@ -60,4 +60,19 @@ footer>div img{width:130px;height:82px;object-fit:cover;object-position:center;f
 .contact-hours span,.contact-business span{font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:#c7d1c0}
 .contact-hours small,.contact-business small{color:#d3dacb;font-size:12px}
 .footer-company-details{margin-top:10px!important;color:#b8aa9b;line-height:1.5}
+/* Czytelne opisy produktow: skrot na karcie, pelna tresc w oknie produktu. */
+.product-description{line-height:1.65;min-height:59px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.product-description-full{color:var(--muted);font-size:14px;line-height:1.75}
+.product-description-full p{margin:0 0 14px}.product-description-full p:last-child{margin-bottom:0}
+.product-description-full ul{margin:0 0 16px;padding-left:20px}.product-description-full li+li{margin-top:6px}
+.product-handmade-note{margin:20px 0 0;padding:13px 15px;border-left:3px solid var(--amber);background:#f4e7d2;color:var(--muted);font-size:12px;line-height:1.65}
+.product-fulfilment{display:flex;flex-direction:column;gap:2px;margin-top:15px;padding-top:12px;border-top:1px solid var(--line)}
+.product-fulfilment span{position:relative;padding-left:14px;color:var(--green);font-size:11px;font-weight:700}.product-fulfilment span:before{content:"";position:absolute;left:0;top:50%;width:7px;height:7px;border-radius:50%;background:var(--green);transform:translateY(-50%)}
+.product-fulfilment small{color:var(--muted);font-size:10px}.spec-availability{color:var(--green)}
+.faq-section{padding:110px clamp(24px,8vw,140px);background:var(--paper)}
+.faq-shell{width:min(980px,100%);margin:0 auto}.faq-head{margin-bottom:42px}.faq-head h2{margin:0;font-family:var(--serif);font-size:clamp(38px,4vw,60px);line-height:1.08;letter-spacing:-.03em}
+.faq-list{border-top:1px solid var(--line)}.faq-item{border-bottom:1px solid var(--line)}
+.faq-item summary{position:relative;padding:24px 55px 24px 0;list-style:none;cursor:pointer;font-family:var(--serif);font-size:21px;font-weight:600}.faq-item summary::-webkit-details-marker{display:none}.faq-item summary:after{content:"+";position:absolute;right:8px;top:50%;color:var(--amber);font-family:var(--sans);font-size:28px;font-weight:400;transform:translateY(-50%);transition:.25s}.faq-item[open] summary:after{transform:translateY(-50%) rotate(45deg)}
+.faq-answer{max-width:820px;padding:0 55px 25px 0;color:var(--muted);font-size:14px;line-height:1.75}.faq-answer a{color:var(--cognac);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:560px){.faq-section{padding:75px 22px}.faq-head{margin-bottom:28px}.faq-item summary{padding:20px 45px 20px 0;font-size:18px}.faq-answer{padding-right:20px}}
 .cart-item-main{min-width:0}.cart-color-list{margin-top:12px;display:grid;gap:8px}.cart-color-choice{display:flex;flex-direction:column;gap:5px}.cart-color-choice span{font-size:9px;text-transform:uppercase;letter-spacing:.09em;font-weight:700;color:var(--cognac)}.cart-color-choice select{width:100%;border:1px solid var(--line);background:#fffaf3;padding:9px 10px;outline:none;color:var(--ink);font-size:12px}.cart-color-choice select:focus{border-color:var(--amber)}

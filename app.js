@@ -48,6 +48,20 @@ i18n.pl.closedSunday = 'Niedziela: nieczynne';
 i18n.pl.sellerDetails = 'Dane sprzedawcy';
 i18n.pl.reviewPhotosLabel = 'Zdjęcia do opinii';
 i18n.pl.reviewPhotosHint = 'Możesz dodać maksymalnie 4 zdjęcia: JPG, PNG, WEBP, GIF lub AVIF. Jedno zdjęcie maks. 8 MB.';
+i18n.pl.availability = 'Dostępność';
+i18n.pl.shippingTime = 'Czas realizacji';
+i18n.pl.faqEyebrow = 'Warto wiedzieć';
+i18n.pl.faqTitle = 'FAQ – najczęstsze pytania';
+i18n.pl.faqQ1 = 'Czy każde drzewko wygląda identycznie?';
+i18n.pl.faqA1 = 'Nie. Każde drzewko jest wykonywane ręcznie. Naturalna podstawa, kształt gałązek i ułożenie bursztynu mogą delikatnie różnić się od egzemplarza przedstawionego na zdjęciach.';
+i18n.pl.faqQ2 = 'Jak wybrać kolor bursztynu?';
+i18n.pl.faqA2 = 'Po dodaniu produktu do koszyka wybierz kolor osobno dla każdej sztuki: Mix kolor, Cytryna, Koniak jasny/ciemny lub Wiśnia. Przedstawione kolory są poglądowe.';
+i18n.pl.faqQ3 = 'Ile trwa realizacja?';
+i18n.pl.faqA3 = 'Aktualny czas realizacji jest podany przy każdym produkcie. Standardowo wysyłka następuje w ciągu 1–3 dni roboczych. Termin zamówień indywidualnych i hurtowych ustalamy osobno.';
+i18n.pl.faqQ4 = 'Czy wystawiana jest faktura?';
+i18n.pl.faqA4 = 'Tak. Podczas składania zamówienia możesz wybrać paragon albo fakturę VAT. Po wybraniu faktury pojawią się pola na dane nabywcy i NIP.';
+i18n.pl.faqQ5 = 'Jak działa zwrot?';
+i18n.pl.faqA5 = 'W przypadku standardowego produktu poinformuj nas o odstąpieniu w ciągu 14 dni od jego otrzymania, a następnie odeślij odpowiednio zabezpieczony produkt. Produkty wykonane według indywidualnej specyfikacji mogą nie podlegać zwrotowi. Szczegóły znajdziesz w dokumencie <a href="dostawa-i-zwroty.html">Dostawa i zwroty</a>.';
 i18n.en.workshop = 'Amberflo workshop';
 i18n.en.announcement = 'Free delivery from PLN 300 · Handmade in Poland · Wholesale orders';
 i18n.en.notesLabel = 'Order notes';
@@ -80,6 +94,20 @@ i18n.en.closedSunday = 'Sunday: closed';
 i18n.en.sellerDetails = 'Seller details';
 i18n.en.reviewPhotosLabel = 'Review photos';
 i18n.en.reviewPhotosHint = 'You can add up to 4 photos: JPG, PNG, WEBP, GIF or AVIF. One photo max. 8 MB.';
+i18n.en.availability = 'Availability';
+i18n.en.shippingTime = 'Fulfilment time';
+i18n.en.faqEyebrow = 'Good to know';
+i18n.en.faqTitle = 'Frequently asked questions';
+i18n.en.faqQ1 = 'Does every tree look identical?';
+i18n.en.faqA1 = 'No. Every tree is handmade. The natural base, branch shape and arrangement of amber may differ slightly from the piece shown in the photos.';
+i18n.en.faqQ2 = 'How do I choose the amber colour?';
+i18n.en.faqA2 = 'After adding a product to the cart, choose the colour separately for each piece: Colour mix, Lemon, Light/dark cognac or Cherry. The colours shown are for reference.';
+i18n.en.faqQ3 = 'How long does fulfilment take?';
+i18n.en.faqA3 = 'The current fulfilment time is shown with each product. Orders are usually dispatched within 1–3 business days. Lead times for custom and wholesale orders are agreed individually.';
+i18n.en.faqQ4 = 'Can I receive a VAT invoice?';
+i18n.en.faqA4 = 'Yes. During checkout, you can choose a receipt or VAT invoice. When you select an invoice, fields for the buyer details and tax ID will appear.';
+i18n.en.faqQ5 = 'How do returns work?';
+i18n.en.faqA5 = 'For a standard product, notify us of your withdrawal within 14 days of receiving it and then return the properly secured product. Products made to an individual specification may be excluded from returns. See <a href="dostawa-i-zwroty.html">Delivery and returns</a> for details.';
 
 const amberColorOptions = [
   {value:'Mix kolor',pl:'Mix kolor',en:'Colour mix'},
@@ -106,16 +134,34 @@ async function loadCatalog(){
     const rows=await response.json();
     if(!rows.length)return;
     products=rows.map(row=>({
-      id:row.id,category:row.category,name:{pl:row.name_pl,en:row.name_en||row.name_pl},price:Number(row.price),height:row.height||'—',pieces:row.pieces||'—',width:row.width||'—',image:row.main_image||(row.gallery?.[0]||''),gallery:Array.isArray(row.gallery)&&row.gallery.length?row.gallery:[row.main_image].filter(Boolean),badge:{pl:row.badge_pl||'',en:row.badge_en||row.badge_pl||''},desc:{pl:row.description_pl||'',en:row.description_en||row.description_pl||''}
+      id:row.id,category:row.category,name:{pl:row.name_pl,en:row.name_en||row.name_pl},price:Number(row.price),height:row.height||'—',pieces:row.pieces||'—',width:row.width||'—',image:row.main_image||(row.gallery?.[0]||''),gallery:Array.isArray(row.gallery)&&row.gallery.length?row.gallery:[row.main_image].filter(Boolean),badge:{pl:row.badge_pl||'',en:row.badge_en||row.badge_pl||''},desc:{pl:row.description_pl||'',en:row.description_en||row.description_pl||''},availability:{pl:row.availability_pl||'Dostępny',en:row.availability_en||'Available'},shippingTime:{pl:row.shipping_time_pl||'Wysyłka w 1–3 dni robocze',en:row.shipping_time_en||'Ships within 1–3 business days'}
     }));
     renderProducts();renderCart();
   }catch(error){console.warn('Katalog offline — używam produktów zapisanych w stronie.');}
 }
 
 function renderSwatches(){ $('#swatches').innerHTML=colors.map(c=>`<div class="swatch"><div class="swatch-color" style="background:${c[0]}"></div><b>${currentLang==='pl'?c[1]:c[2]}</b></div>`).join(''); }
-function renderProducts(){ const visible=products.filter(p=>activeFilter==='all'||p.category===activeFilter); $('#productGrid').innerHTML=visible.map(p=>`<article class="product-card"><div class="product-image" data-detail="${p.id}" role="button" tabindex="0"><span class="product-badge">${p.badge[currentLang]}</span><img src="${p.image}" alt="${p.name[currentLang]}" loading="lazy"></div><div class="product-info"><div class="product-meta"><span>${p.height}</span><span>${p.pieces} ${currentLang==='pl'?'bryłek':'stones'}</span></div><h3>${p.name[currentLang]}</h3><p class="product-description">${p.desc[currentLang]}</p><div class="product-bottom"><strong class="price">${money(p.price)}</strong><button class="add-cart" data-add="${p.id}" aria-label="${t('addToCart')}">+</button></div></div></article>`).join(''); }
+function renderProducts(){ const visible=products.filter(p=>activeFilter==='all'||p.category===activeFilter); $('#productGrid').innerHTML=visible.map(p=>`<article class="product-card"><div class="product-image" data-detail="${escapeHtml(p.id)}" role="button" tabindex="0"><span class="product-badge">${escapeHtml(p.badge[currentLang])}</span><img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name[currentLang])}" loading="lazy"></div><div class="product-info"><div class="product-meta"><span>${escapeHtml(p.height)}</span><span>${escapeHtml(p.pieces)} ${currentLang==='pl'?'bryłek':'stones'}</span></div><h3>${escapeHtml(p.name[currentLang])}</h3><p class="product-description">${escapeHtml(descriptionPlainText(p.desc[currentLang]))}</p><div class="product-fulfilment"><span>${escapeHtml(productAvailability(p))}</span><small>${escapeHtml(productShippingTime(p))}</small></div><div class="product-bottom"><strong class="price">${money(p.price)}</strong><button class="add-cart" data-add="${escapeHtml(p.id)}" aria-label="${escapeHtml(t('addToCart'))}">+</button></div></div></article>`).join(''); }
 function updateI18n(){ document.documentElement.lang=currentLang; document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.dataset.i18n;if(i18n[currentLang][key])el.innerHTML=i18n[currentLang][key]}); document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const key=el.dataset.i18nPlaceholder;if(i18n[currentLang][key])el.placeholder=i18n[currentLang][key]}); document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLang)); renderSwatches();renderProducts();renderReviews();renderCart(); }
 function escapeHtml(s=''){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+function descriptionPlainText(value=''){return String(value).replace(/\r\n?/g,'\n').replace(/\s+/g,' ').trim();}
+function productAvailability(product){return product.availability?.[currentLang]||product.availability?.pl||(currentLang==='pl'?'Dostępny':'Available');}
+function productShippingTime(product){return product.shippingTime?.[currentLang]||product.shippingTime?.pl||(currentLang==='pl'?'Wysyłka w 1–3 dni robocze':'Ships within 1–3 business days');}
+function formatProductDescription(value=''){
+  const lines=String(value).replace(/\r\n?/g,'\n').split('\n');
+  let html='';let paragraph=[];let list=[];
+  const flushParagraph=()=>{if(paragraph.length){html+=`<p>${paragraph.map(escapeHtml).join('<br>')}</p>`;paragraph=[];}};
+  const flushList=()=>{if(list.length){html+=`<ul>${list.map(item=>`<li>${escapeHtml(item)}</li>`).join('')}</ul>`;list=[];}};
+  lines.forEach(rawLine=>{
+    const line=rawLine.trim();
+    if(!line){flushParagraph();flushList();return;}
+    const bullet=line.match(/^[-•]\s+(.+)$/);
+    if(bullet){flushParagraph();list.push(bullet[1]);return;}
+    flushList();paragraph.push(line);
+  });
+  flushParagraph();flushList();
+  return html;
+}
 function syncCartItem(item){const qty=Math.max(1,Math.min(20,Number(item.qty)||1));const source=Array.isArray(item.colors)?item.colors:[];const allowedColors=new Set(amberColorOptions.map(option=>option.value));const colors=Array.from({length:qty},(_,index)=>{const value=String(source[index]||'');return allowedColors.has(value)?value:''});return {...item,qty,colors};}
 function normalizeCart(){cart=(Array.isArray(cart)?cart:[]).filter(item=>item&&item.id).map(syncCartItem);}
 function cartColorOptionsHtml(selected=''){return `<option value="">${t('amberColorPlaceholder')}</option>${amberColorOptions.map(option=>`<option value="${escapeHtml(option.value)}" ${option.value===selected?'selected':''}>${escapeHtml(currentLang==='pl'?option.pl:option.en)}</option>`).join('')}`;}
@@ -139,7 +185,7 @@ function updateGallery(index){
   if(counter)counter.textContent=`${activeGalleryIndex+1} / ${activeGallery.length}`;
   document.querySelectorAll('[data-gallery-index]').forEach((button,i)=>button.classList.toggle('active',i===activeGalleryIndex));
 }
-function openProduct(id){const p=products.find(x=>x.id===id);activeGallery=p.gallery?.length?p.gallery:[p.image];activeGalleryIndex=0;const arrows=activeGallery.length>1?`<button class="gallery-arrow prev" data-gallery-nav="-1" aria-label="${currentLang==='pl'?'Poprzednie zdjęcie':'Previous image'}">‹</button><button class="gallery-arrow next" data-gallery-nav="1" aria-label="${currentLang==='pl'?'Następne zdjęcie':'Next image'}">›</button>`:'';const thumbs=activeGallery.length>1?`<div class="gallery-thumbs">${activeGallery.map((src,i)=>`<button class="gallery-thumb ${i===0?'active':''}" data-gallery-index="${i}" aria-label="${currentLang==='pl'?'Pokaż zdjęcie':'Show image'} ${i+1}"><img src="${src}" alt=""></button>`).join('')}</div>`:'';$('#productModalContent').innerHTML=`<div class="product-modal-grid"><div class="product-gallery"><div class="gallery-stage"><img id="modalGalleryImage" src="${activeGallery[0]}" alt="${p.name[currentLang]}">${arrows}<span class="gallery-counter" id="galleryCounter">1 / ${activeGallery.length}</span></div>${thumbs}</div><div class="product-modal-copy"><p class="eyebrow">Amberflo · ${p.badge[currentLang]}</p><h2>${p.name[currentLang]}</h2><p>${p.desc[currentLang]} ${currentLang==='pl'?'Każdy egzemplarz jest wykonywany ręcznie, dlatego podstawa i układ gałązek mogą delikatnie różnić się od zdjęcia.':'Each piece is handmade, so the base and arrangement of branches may vary slightly from the photo.'}</p><div class="specs"><div><span>${t('height')}</span><b>${p.height}</b></div><div><span>${t('pieces')}</span><b>${p.pieces}</b></div><div><span>${t('width')}</span><b>${p.width}</b></div><div><span>${t('material')}</span><b>${t('materialValue')}</b></div></div><p class="gallery-note">${currentLang==='pl'?'Zdjęcia przedstawiają dostępne, ręcznie wykonane warianty. Naturalna podstawa i układ bursztynu są unikatowe.':'Photos show available handmade variants. The natural base and amber arrangement are unique.'}</p><p class="modal-price">${money(p.price)}</p><button class="button button-primary full" data-modal-add="${p.id}">${t('addToCart')}</button></div></div>`;$('#productModal').showModal();}
+function openProduct(id){const p=products.find(x=>x.id===id);if(!p)return;activeGallery=p.gallery?.length?p.gallery:[p.image];activeGalleryIndex=0;const arrows=activeGallery.length>1?`<button class="gallery-arrow prev" data-gallery-nav="-1" aria-label="${currentLang==='pl'?'Poprzednie zdjęcie':'Previous image'}">‹</button><button class="gallery-arrow next" data-gallery-nav="1" aria-label="${currentLang==='pl'?'Następne zdjęcie':'Next image'}">›</button>`:'';const thumbs=activeGallery.length>1?`<div class="gallery-thumbs">${activeGallery.map((src,i)=>`<button class="gallery-thumb ${i===0?'active':''}" data-gallery-index="${i}" aria-label="${currentLang==='pl'?'Pokaż zdjęcie':'Show image'} ${i+1}"><img src="${escapeHtml(src)}" alt=""></button>`).join('')}</div>`:'';const handmadeNote=currentLang==='pl'?'Każdy egzemplarz jest wykonywany ręcznie, dlatego podstawa i układ gałązek mogą delikatnie różnić się od zdjęcia.':'Each piece is handmade, so the base and arrangement of branches may vary slightly from the photo.';$('#productModalContent').innerHTML=`<div class="product-modal-grid"><div class="product-gallery"><div class="gallery-stage"><img id="modalGalleryImage" src="${escapeHtml(activeGallery[0])}" alt="${escapeHtml(p.name[currentLang])}">${arrows}<span class="gallery-counter" id="galleryCounter">1 / ${activeGallery.length}</span></div>${thumbs}</div><div class="product-modal-copy"><p class="eyebrow">Amberflo · ${escapeHtml(p.badge[currentLang])}</p><h2>${escapeHtml(p.name[currentLang])}</h2><div class="product-description-full">${formatProductDescription(p.desc[currentLang])}</div><p class="product-handmade-note">${escapeHtml(handmadeNote)}</p><div class="specs"><div><span>${escapeHtml(t('availability'))}</span><b class="spec-availability">${escapeHtml(productAvailability(p))}</b></div><div><span>${escapeHtml(t('shippingTime'))}</span><b>${escapeHtml(productShippingTime(p))}</b></div><div><span>${escapeHtml(t('height'))}</span><b>${escapeHtml(p.height)}</b></div><div><span>${escapeHtml(t('pieces'))}</span><b>${escapeHtml(p.pieces)}</b></div><div><span>${escapeHtml(t('width'))}</span><b>${escapeHtml(p.width)}</b></div><div><span>${escapeHtml(t('material'))}</span><b>${escapeHtml(t('materialValue'))}</b></div></div><p class="gallery-note">${currentLang==='pl'?'Zdjęcia przedstawiają dostępne, ręcznie wykonane warianty. Naturalna podstawa i układ bursztynu są unikatowe.':'Photos show available handmade variants. The natural base and amber arrangement are unique.'}</p><p class="modal-price">${money(p.price)}</p><button class="button button-primary full" data-modal-add="${escapeHtml(p.id)}">${escapeHtml(t('addToCart'))}</button></div></div>`;$('#productModal').showModal();}
 async function submitOrder(form){const data=Object.fromEntries(new FormData(form));const items=getOrderItems();const status=$('#checkoutStatus');status.textContent='…';const missingColor=findMissingCartColor();if(missingColor){status.textContent=t('cartColorMissing');toggleCart(true);setTimeout(()=>document.querySelector(`[data-cart-color="${missingColor.id}"][data-color-index="${missingColor.index}"]`)?.focus(),120);return}if(data.payment==='online'){if(!cfg.supabaseUrl||!cfg.supabaseAnonKey){status.textContent=t('configNeeded');return}try{const res=await fetch(`${cfg.supabaseUrl}/functions/v1/create-checkout`,{method:'POST',headers:{Authorization:`Bearer ${cfg.supabaseAnonKey}`,'Content-Type':'application/json'},body:JSON.stringify({customer:data,items,language:currentLang})});const out=await res.json();if(!res.ok||!out.url)throw new Error(out.error||'Checkout');window.location.href=out.url;}catch(e){status.textContent=currentLang==='pl'?'Nie udało się uruchomić płatności. Spróbuj ponownie.':'Could not start payment. Please try again.';}return}
   const lines=cartOrderLines();const total=money(cart.reduce((s,x)=>{const p=products.find(product=>product.id===x.id);return s+(p?p.price*x.qty:0)},0));const body=`NOWE ZAMÓWIENIE AMBERFLO\n\nKlient: ${data.name}\nTelefon: ${data.phone}\nE-mail: ${data.email}\nAdres: ${data.address}\nUwagi: ${data.notes||'-'}\n\n${lines}\n\nSuma: ${total}\nPłatność: przelew tradycyjny`;if(cfg.supabaseUrl&&cfg.supabaseAnonKey){try{await fetch(`${cfg.supabaseUrl}/functions/v1/notify`,{method:'POST',headers:{Authorization:`Bearer ${cfg.supabaseAnonKey}`,'Content-Type':'application/json'},body:JSON.stringify({type:'order',payload:{...data,items,summary:lines,total}})});status.textContent=t('orderSaved');cart=[];saveCart();return}catch(e){}}
   status.textContent=t('emailOrder');window.location.href=`mailto:biuroamberflo@gmail.com?subject=${encodeURIComponent('Nowe zamówienie Amberflo')}&body=${encodeURIComponent(body)}`;

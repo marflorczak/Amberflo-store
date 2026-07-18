@@ -71,6 +71,10 @@ create table if not exists public.products (
   name_en text,
   description_pl text not null default '',
   description_en text not null default '',
+  availability_pl text not null default 'Dostępny',
+  availability_en text not null default 'Available',
+  shipping_time_pl text not null default 'Wysyłka w 1–3 dni robocze',
+  shipping_time_en text not null default 'Ships within 1–3 business days',
   price integer not null check (price >= 0),
   category text not null default 'classic' check (category in ('small','classic','large')),
   height text,
@@ -85,6 +89,10 @@ create table if not exists public.products (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+alter table public.products add column if not exists availability_pl text not null default 'Dostępny';
+alter table public.products add column if not exists availability_en text not null default 'Available';
+alter table public.products add column if not exists shipping_time_pl text not null default 'Wysyłka w 1–3 dni robocze';
+alter table public.products add column if not exists shipping_time_en text not null default 'Ships within 1–3 business days';
 alter table public.products enable row level security;
 
 drop policy if exists "Public can read active products" on public.products;

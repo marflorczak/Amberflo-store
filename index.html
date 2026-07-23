@@ -90,7 +90,7 @@
   <link rel="stylesheet" href="shipping.css?v=5">
   <script src="config.js?v=5" defer></script>
   <script src="products.js" defer></script>
-  <script src="app.js?v=25" defer></script>
+  <script src="app.js?v=26" defer></script>
   <script src="shipping.js?v=6" defer></script>
 </head>
 <body>
@@ -353,7 +353,7 @@
       </section>
       <label><span data-i18n="notesLabel">Uwagi do zamówienia</span><textarea name="notes" rows="2" placeholder="np. jaśniejsza podstawa, dedykacja, termin realizacji" data-i18n-placeholder="notesPlaceholder"></textarea></label>
       <div class="shipping-summary"><div><span>Produkty</span><b id="checkoutProductsTotal">0 zł</b></div><div><span>Dostawa</span><b id="checkoutShippingTotal">0 zł</b></div><div class="shipping-grand-total"><span>Razem</span><b id="checkoutGrandTotal">0 zł</b></div></div>
-      <fieldset><legend data-i18n="paymentLabel">Metoda płatności</legend><label class="payment-option"><input type="radio" name="payment" value="online" checked><span><b data-i18n="onlinePayment">Karta / BLIK / Przelewy24</b><small>Stripe Checkout</small></span></label><label class="payment-option"><input type="radio" name="payment" value="transfer"><span><b data-i18n="traditionalTransfer">Przelew tradycyjny</b><small>mBank · 92 1140 2004 0000 3102 7968 1765</small></span></label></fieldset>
+      <fieldset><legend data-i18n="paymentLabel">Metoda płatności</legend><label class="payment-option"><input type="radio" name="payment" value="online" checked><span><b data-i18n="onlinePayment">Karta / BLIK</b><small>Stripe Checkout</small></span></label><label class="payment-option"><input type="radio" name="payment" value="transfer"><span><b data-i18n="traditionalTransfer">Przelew tradycyjny</b><small>mBank · 92 1140 2004 0000 3102 7968 1765</small></span></label></fieldset>
       <label class="legal-consent"><input type="checkbox" name="legal" required><span data-i18n="consentText">Akceptuję <a href="regulamin.html" target="_blank">regulamin</a> oraz zapoznałem/am się z <a href="polityka-prywatnosci.html" target="_blank">polityką prywatności</a> i zasadami <a href="dostawa-i-zwroty.html" target="_blank">dostaw i zwrotów</a>.</span></label>
       <button class="button button-primary full" type="submit" data-i18n="placeOrder">Złóż zamówienie</button>
       <p class="form-status" id="checkoutStatus"></p>

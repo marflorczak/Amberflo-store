@@ -12,9 +12,18 @@ serve(async req => {
     if (!signature) throw new Error("Brak podpisu Stripe");
     const body = await req.text();
     const event = await stripe.webhooks.constructEventAsync(body, signature, Deno.env.get("STRIPE_WEBHOOK_SECRET")!, undefined, cryptoProvider);
-    if (!["checkout.session.completed", "checkout.session.async_payment_succeeded", "checkout.session.async_payment_failed"].includes(event.type)) return new Response("ok");
+    if (!["checkout.session.completed", "checkout.session.async_payment_succeeded", "checkout.session.async_payment_failed", "checkout.session.expired"].includes(event.type)) return new Response("ok");
     const session = event.data.object as Stripe.Checkout.Session;
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    if (event.type === "checkout.session.expired") {
+      const { error: expiredError } = await supabase
+        .from("orders")
+        .update({ status: "payment_expired", updated_at: new Date().toISOString() })
+        .eq("stripe_session_id", session.id)
+        .eq("status", "awaiting_payment");
+      if (expiredError) throw expiredError;
+      return new Response("ok");
+    }
     if (event.type === "checkout.session.async_payment_failed") {
       await supabase.from("orders").update({ status: "payment_failed", updated_at: new Date().toISOString() }).eq("stripe_session_id", session.id);
       return new Response("ok");

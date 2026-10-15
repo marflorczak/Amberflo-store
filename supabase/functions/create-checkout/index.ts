@@ -32,12 +32,12 @@ serve(async req => {
 
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
     const ids = [...new Set(items.map((item: { id: string }) => String(item.id)))];
-    const { data: products, error: productsError } = await supabase.from("products").select("id,name_pl,name_en,price,active").in("id", ids).eq("active", true);
+    const { data: products, error: productsError } = await supabase.from("products").select("id,name_pl,name_en,price,active,purchasable").in("id", ids).eq("active", true);
     if (productsError) throw productsError;
     const productMap = new Map((products || []).map(product => [product.id, product]));
     const normalized = items.map((item: { id: string; qty: number; colors?: unknown[] }) => {
       const product = productMap.get(String(item.id));
-      if (!product) throw new Error("Produkt jest niedostępny");
+      if (!product || product.purchasable === false) throw new Error("Produkt jest niedostępny w sprzedaży");
       const quantity = Math.max(1, Math.min(20, Number(item.qty) || 1));
       return { id: product.id, name: language === "en" ? (product.name_en || product.name_pl) : product.name_pl, quantity, colors: normalizeItemColors(item, quantity), price: Math.round(Number(product.price) * 100) };
     });

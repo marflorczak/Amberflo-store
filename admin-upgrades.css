@@ -23,5 +23,7 @@
 .order-card.order-cancelled .order-status{background:#8d241d;color:#fff}
 .order-card.order-expired{border-color:#c8b99f;background:#f1ece3}
 .order-card.order-expired .order-status{background:#706455;color:#fff}
+.order-card.order-delivered{border-color:#8cad8c;background:#eef6ec}
+.order-card.order-delivered .order-status{background:#3f7144;color:#fff}
 .admin-note{padding:13px 16px;background:#f7ead5;color:var(--muted);font-size:12px;margin-bottom:18px}
 @media(max-width:900px){.shipping-admin-row,.order-actions{grid-template-columns:1fr}.order-details{grid-template-columns:1fr}}

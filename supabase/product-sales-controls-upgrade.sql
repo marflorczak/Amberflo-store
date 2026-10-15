@@ -3,9 +3,11 @@
 
 alter table public.products
   add column if not exists show_price boolean not null default true,
-  add column if not exists purchasable boolean not null default true;
+  add column if not exists purchasable boolean not null default true,
+  add column if not exists show_fulfilment boolean not null default true;
 
 update public.products
 set
   show_price = coalesce(show_price, true),
-  purchasable = coalesce(purchasable, true);
+  purchasable = coalesce(purchasable, true),
+  show_fulfilment = coalesce(show_fulfilment, true);
